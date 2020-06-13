@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html class="h-100 w-100 overflow-hidden">
+  <head>
+    <title>Streamer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="jquery-3.5.1.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      /* body {font: 13px Helvetica, Arial; } */
+      /* form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; } */
+      /* form input { border: 0; padding: 10px; width: 90%; margin-right: 0.5%; } */
+      /* form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; } */
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn, .btn:focus, .btn:active {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .form-control, .form-control:focus, .form-control:active {
+            -webkit-box-shadow: none !important;
+            box-shadow: none !important;
+            border: 0px !important;
+        }
+
+    </style>
+  </head>
+  <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(60, 60, 60);">
+    
+    <div id="loading-div" class="row align-items-center h-100 w-100">
+        <div class="col-12 text-center">
+            <div class="spinner-border text-light"></div>
+        </div>
+      </div>
+  
+      <div class="d-block h-100" id="all-div">
+
+        <div class="float-left h-100" style="width: 600px;">
+            <div class="w-100 text-center">
+                <div class="" style="width: 600px; height: 337.5px; background-color: black;">
+                    <div id="player"></div>
+                </div>
+                <input type="text" class="form-control d-inline-block rounded-0" id="link-input" placeholder="Video Link"/>
+                <button class="btn w-100 d-inline-block rounded-0" id="submit-link-button" style="background-color: rgb(190, 190, 190); color: black;">Submit</button>
+            </div>
+        </div>
+  
+        <div class="h-100 float-right d-inline-block text-center" style="width: calc(100% - 600px)">
+  
+            <!-- <div class="w-100 text-center">
+                <input type="text" class="form-control d-inline-block" id="link-input" placeholder="Video Url" style="max-width: 600px;"/>
+            </div>
+            <div class="w-100 text-center">
+                <button class="btn btn-secondary mt-2 w-100 d-inline-block" id="submit-link-button" style="max-width: 600px;">Submit</button>
+            </div> -->
+
+            <!-- <div>
+                <ul id="messages"></ul>
+                <form action="">
+                    <input id="m" autocomplete="off" /><button>Send</button>
+                </form>
+            </div> -->
+            
+            <div class="w-100 text-center">
+                <div class="w-100" style="height: 100vh; background-color: rgb(40, 40, 40);">
+
+                    <!-- 467px -->
+                
+                    <!-- <div class="p-2"> -->
+
+                        <div class="w-100" id="messages-div" style="height: calc(100% - 38px); overflow-x: hidden; overflow-y: auto;">
+                            <ul id="messages"></ul>
+                        </div>
+
+                        <div class="w-100 position-relative" style="bottom: 0px; height: 38px">
+                            <form action="">
+                                <input type="text" class="form-control d-inline-block float-left rounded-0" id="m" placeholder="Message" autocomplete="off" style="width: 70%;"/>
+                                <button class="btn d-inline-block float-right rounded-0" style="width: 30%; background-color: rgb(190, 190, 190); color: black">Send</button>
+                            </form>
+                        </div>
+                    <!-- </div> -->
+
+                </div>
+            </div>
+
+            <!-- <div class="w-100 position-absolute bg-info" style="bottom: 0px; height: 100px">
+                <form action="" class="w-100">
+                    <input type="text" class="form-control w-100" id="m" placeholder="Message" autocomplete="off"/>
+                    <button>Send</button>
+                </form>
+            </div> -->
+
+        </div>
+      </div>
+    
+    <!-- <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script> -->
+
+    <script>
+       
+        const CURRENT_USER = '_' + Math.random().toString(36).substr(2, 9);
+
+        let VIDEO_ID = '';
+
+        let GOT_VIDEO_ID;
+        let GOT_CURRENT_TIME;
+        let GOT_IS_PAUSED;
+
+        let IS_READY = false;
+
+
+
+        let socket = io();
+
+
+
+        // 2. This code loads the IFrame Player API code asynchronously.
+        var tag = document.createElement('script');
+
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // 3. This function creates an <iframe> (and YouTube player)
+        //    after the API code downloads.
+        // var player;
+        // function onYouTubeIframeAPIReady() {
+        // player = new YT.Player('player', {
+        //     height: '390',
+        //     width: '640',
+        //     videoId: 'M7lc1UVf-VE',
+        //     events: {
+        //     'onReady': onPlayerReady,
+        //     'onStateChange': onPlayerStateChange
+        //     }
+        // });
+        // }
+
+        var player = null;
+        function onYouTubeIframeAPIReady() {
+
+            $("#loading-div").remove();
+
+            // player = new YT.Player('player', {
+            //     height: '337.5',
+            //     width: '600',
+            //     videoId: 'M7lc1UVf-VE',
+            //     events: {
+            //     'onReady': onPlayerReady,
+            //     'onStateChange': onPlayerStateChange
+            //     }
+            // });
+
+            IS_READY = true;
+        }
+
+        // 4. The API will call this function when the video player is ready.
+        function onPlayerReady(event) {
+            // $("#loading-div").remove();
+            // $("#player").removeClass("d-none");
+            // $("#player").addClass("d-inline");
+
+            player.seekTo(GOT_CURRENT_TIME);
+
+            if (GOT_IS_PAUSED) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
+        }
+
+        // 5. The API calls this function when the player's state changes.
+        //    The function indicates that when playing a video (state=1),
+        //    the player should play for six seconds and then stop.
+        function onPlayerStateChange(event) {
+
+            let isPaused = true;
+            if (event.data == YT.PlayerState.PLAYING) {
+                isPaused = false;
+            }
+
+            const currentTime = getVideoTime();
+            if (VIDEO_ID != GOT_VIDEO_ID || isPaused != GOT_IS_PAUSED || (Math.abs(currentTime - GOT_CURRENT_TIME) > 1)) {
+                if (event.data != YT.PlayerState.BUFFERING) {
+                    emitVideoInfo(CURRENT_USER, VIDEO_ID, currentTime, isPaused);
+                }
+            }
+        }
+        
+        function stopVideo() {
+            player.stopVideo();
+        }
+
+        function getVideoTime() {
+            return player.getCurrentTime();
+        }
+
+        function emitVideoInfo(fromUser, videoId, currentTime, isPaused) {
+            const videoInfo = {
+                from_user: fromUser,
+                video_id: videoId,
+                current_time: currentTime,
+                is_paused: isPaused
+            };
+            // var socket = io();
+            socket.emit('video info', videoInfo);
+        }
+
+        $('#link-input').bind('keypress', function(e) {
+            if (e.keyCode == 13) {
+                handleSubmitLink();
+            }
+        });
+
+        $("#submit-link-button").click(function() {
+            handleSubmitLink();
+        });
+
+        function handleSubmitLink() {
+            
+            const videoLink = $("#link-input").val();
+            const videoId = getVideoIdFromLink(videoLink);
+
+            if (videoId != VIDEO_ID) {
+
+                VIDEO_ID = videoId;
+
+                if (player == null) {
+
+                    player = new YT.Player('player', {
+                        height: '337.5',
+                        width: '600',
+                        videoId: videoId,
+                        events: {
+                            'onReady': onPlayerReady,
+                            'onStateChange': onPlayerStateChange
+                        }
+                    });
+
+                } else {
+                    player.loadVideoById(videoId);
+                }
+
+                player.pauseVideo();
+                emitVideoInfo(CURRENT_USER, VIDEO_ID, 0, true);
+            }
+        }
+
+        function getVideoIdFromLink(videoLink) {
+            var videoId = videoLink.split('v=')[1];
+            var ampersandPosition = videoId.indexOf('&');
+            if (ampersandPosition != -1) {
+                videoId = videoId.substring(0, ampersandPosition);
+            }
+            return videoId;
+        }
+
+
+        $(function () {
+        //   var socket = io();
+          $('form').submit(function(e){
+            e.preventDefault(); // prevents page reloading
+            const messageText = $('#m').val().trim();
+            if (messageText != '') {
+                socket.emit('chat message', messageText);
+            }
+            $('#m').val('');
+            return false;
+          });
+          socket.on('chat message', function(msg){
+            $('#messages').append($('<li>').text(msg));
+            let messagesDiv = document.getElementById("messages-div");
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+          });
+
+
+          socket.on('video info', function(info){
+
+            if (!IS_READY) {
+                return;
+            }
+
+
+
+
+
+            const fromUser = info.from_user;
+            const videoId = info.video_id;
+            const currentTime = info.current_time;
+            const isPaused = info.is_paused;
+
+            if (fromUser != CURRENT_USER) {
+
+                GOT_VIDEO_ID = videoId;
+                GOT_CURRENT_TIME = currentTime;
+                GOT_IS_PAUSED = isPaused;
+
+                if (videoId != VIDEO_ID) {
+
+                    VIDEO_ID = videoId;
+
+                    if (player == null) {
+
+                        player = new YT.Player('player', {
+                            height: '337.5',
+                            width: '600',
+                            videoId: videoId,
+                            events: {
+                            'onReady': onPlayerReady,
+                            'onStateChange': onPlayerStateChange
+                            }
+                        });
+
+                    } else {
+                        player.loadVideoById(videoId);
+                    }
+
+                } else {
+
+                    player.seekTo(currentTime);
+
+                    if (isPaused) {
+                        player.pauseVideo();
+                    } else {
+                        player.playVideo();
+                    }
+                }
+            }
+
+
+
+
+            
+          });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        });
+    </script>
+
+  </body>
+</html>
+
