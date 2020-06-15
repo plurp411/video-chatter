@@ -1,24 +1,17 @@
 <!DOCTYPE html>
 <html class="h-100 w-100 overflow-hidden">
   <head>
-    <title>Streamer</title>
+    <title>Video Chat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <!-- <script src="jquery-3.5.1.js"></script> -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="jquery-3.5.1.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      /* body {font: 13px Helvetica, Arial; } */
-      /* form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; } */
-      /* form input { border: 0; padding: 10px; width: 90%; margin-right: 0.5%; } */
-      /* form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; } */
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
 
         .btn:hover {
             opacity: 0.9;
@@ -35,10 +28,29 @@
             border: 0px !important;
         }
 
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgb(138, 138, 138, 0.3); 
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgb(138, 138, 138, 0.4); 
+        }
+
+        #sender-name-input::placeholder {
+            /* color: rgb(80, 80, 80); */
+            color: black;
+            opacity: 0.8;
+        }
+
     </style>
   </head>
-  <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(60, 60, 60);">
-    
+  <!-- <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(80, 80, 80);"> -->
+  <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(60, 60, 60);"></body>
+
     <div id="loading-div" class="row align-items-center h-100 w-100">
         <div class="col-12 text-center">
             <div class="spinner-border text-light"></div>
@@ -47,13 +59,23 @@
   
       <div class="d-block h-100" id="all-div">
 
-        <div class="float-left h-100" style="width: 600px;">
-            <div class="w-100 text-center">
+        <div class="float-left" style="width: 600px; height: 100vh;">
+            <div class="w-100 h-100 text-center">
                 <div class="" style="width: 600px; height: 337.5px; background-color: black;">
                     <div id="player"></div>
                 </div>
-                <input type="text" class="form-control d-inline-block rounded-0" id="link-input" placeholder="Video Link"/>
-                <button class="btn w-100 d-inline-block rounded-0" id="submit-link-button" style="background-color: rgb(190, 190, 190); color: black;">Submit</button>
+                <input type="text" class="form-control d-inline-block rounded-0 w-100" id="link-input" placeholder="Video Link"/>
+                <button class="btn w-100 d-inline-block rounded-0 font-weight-bold" id="submit-link-button" style="background-color: rgb(190, 190, 190); color: black;">Submit</button>
+
+
+
+                <div class="w-100" id="videos-div" style="height: calc(100% - 337.5px - 38px - 38px - 38px - 38px); overflow-x: hidden; overflow-y: auto;">
+                    <ul class="list-group list-group-flush" id="videos"></ul>
+                </div>
+
+
+                <button class="invisible btn d-inline-block rounded-0 position-absolute font-weight-bold" id="next-video-button" style="width: 600px; left: 0px; bottom: 38px; background-color: rgb(190, 190, 190); color: black;">Next Video</button>
+                <input type="text" class="form-control d-block rounded-0 position-absolute font-weight-bold" id="sender-name-input" placeholder="Display Name" style="width: 600px; bottom: 0px; color: black;"/>
             </div>
         </div>
   
@@ -81,13 +103,16 @@
                     <!-- <div class="p-2"> -->
 
                         <div class="w-100" id="messages-div" style="height: calc(100% - 38px); overflow-x: hidden; overflow-y: auto;">
-                            <ul id="messages"></ul>
+                            <div id="messages"></div>
                         </div>
 
                         <div class="w-100 position-relative" style="bottom: 0px; height: 38px">
-                            <form action="">
-                                <input type="text" class="form-control d-inline-block float-left rounded-0" id="m" placeholder="Message" autocomplete="off" style="width: 70%;"/>
+                            <!-- <form action="">
+                                <input type="text" class="form-control d-inline-block float-left rounded-0" id="message_input" placeholder="Message" autocomplete="off" style="width: 70%;"/>
                                 <button class="btn d-inline-block float-right rounded-0" style="width: 30%; background-color: rgb(190, 190, 190); color: black">Send</button>
+                            </form> -->
+                            <form action="">
+                                <input type="text" class="form-control d-inline-block float-left rounded-0 w-100" id="message_input" placeholder="Message" autocomplete="off"/>
                             </form>
                         </div>
                     <!-- </div> -->
@@ -109,7 +134,17 @@
 
     <script>
        
-        const CURRENT_USER = '_' + Math.random().toString(36).substr(2, 9);
+       function create_UUID() {
+            var dt = new Date().getTime();
+            var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = (dt + Math.random()*16)%16 | 0;
+                dt = Math.floor(dt/16);
+                return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+            });
+            return uuid;
+        }
+
+        const CURRENT_USER = create_UUID();
 
         let VIDEO_ID = '';
 
@@ -117,13 +152,14 @@
         let GOT_CURRENT_TIME;
         let GOT_IS_PAUSED;
 
-        let IS_READY = false;
+        let IS_API_READY = false;
+        let IS_PLAYER_READY = false;
 
+        let LAST_MESSAGE_INFO = {};
 
+        let GOT_INFO = null;
 
         let socket = io();
-
-
 
         // 2. This code loads the IFrame Player API code asynchronously.
         var tag = document.createElement('script');
@@ -148,6 +184,72 @@
         // }
 
         var player = null;
+
+
+
+
+
+
+
+        function updateVideoPlayer(info) {
+
+            const fromUser = info.from_user;
+            const videoId = info.video_id;
+            const currentTime = info.current_time;
+            const isPaused = info.is_paused;
+
+            if (fromUser != CURRENT_USER) {
+
+                GOT_VIDEO_ID = videoId;
+                GOT_CURRENT_TIME = currentTime;
+                GOT_IS_PAUSED = isPaused;
+
+                if (videoId != VIDEO_ID) {
+
+                    VIDEO_ID = videoId;
+
+                    if (player === null) {
+
+                        player = new YT.Player('player', {
+                            height: '337.5',
+                            width: '600',
+                            videoId: videoId,
+                            playerVars: { 'autoplay': 1 },
+                            events: {
+                            'onReady': onPlayerReady,
+                            'onStateChange': onPlayerStateChange
+                            }
+                        });
+
+                    } else {
+                        player.loadVideoById(videoId);
+                    }
+
+                } else if (IS_PLAYER_READY) {
+
+                    player.seekTo(currentTime);
+
+                    if (isPaused) {
+                        player.pauseVideo();
+                    } else {
+                        player.playVideo();
+                    }
+
+                } else {
+                    GOT_CURRENT_TIME = currentTime;
+                    GOT_IS_PAUSED = isPaused;
+                }
+            }
+
+        }
+
+
+
+
+
+
+
+
         function onYouTubeIframeAPIReady() {
 
             $("#loading-div").remove();
@@ -162,7 +264,11 @@
             //     }
             // });
 
-            IS_READY = true;
+            IS_API_READY = true;
+            
+            if (GOT_INFO !== null) {
+                updateVideoPlayer(GOT_INFO);
+            }
         }
 
         // 4. The API will call this function when the video player is ready.
@@ -170,6 +276,8 @@
             // $("#loading-div").remove();
             // $("#player").removeClass("d-none");
             // $("#player").addClass("d-inline");
+
+            IS_PLAYER_READY = true;
 
             player.seekTo(GOT_CURRENT_TIME);
 
@@ -213,8 +321,7 @@
                 current_time: currentTime,
                 is_paused: isPaused
             };
-            // var socket = io();
-            socket.emit('video info', videoInfo);
+            socket.emit('video_info', videoInfo);
         }
 
         $('#link-input').bind('keypress', function(e) {
@@ -224,24 +331,48 @@
         });
 
         $("#submit-link-button").click(function() {
+
             handleSubmitLink();
+
+            // const videoLink = $("#link-input").val().trim();
+            // const videoId = getVideoIdFromLink(videoLink);
+
+            // if (!videoId) {
+            //     return;
+            // }
+
+            // $('#videos').append(`
+            //     <li class="list-group-item small text-left" style="background-color: rgb(60, 60, 60); color: rgb(235, 235, 235);">${videoLink}</li>
+            // `);
+        });
+
+        $('#sender-name-input').on('focus', function() {
+            $('#sender-name-input').css('background-color', 'white');
         });
 
         function handleSubmitLink() {
             
-            const videoLink = $("#link-input").val();
+            const senderName = $("#sender-name-input").val().trim();
+
+            if (senderName == '') {
+                $('#sender-name-input').css('background-color', '#ffc1bd');
+                return;
+            }
+
+            const videoLink = $("#link-input").val().trim();
             const videoId = getVideoIdFromLink(videoLink);
 
             if (videoId != VIDEO_ID) {
 
                 VIDEO_ID = videoId;
 
-                if (player == null) {
+                if (player === null) {
 
                     player = new YT.Player('player', {
                         height: '337.5',
                         width: '600',
                         videoId: videoId,
+                        playerVars: { 'autoplay': 1 },
                         events: {
                             'onReady': onPlayerReady,
                             'onStateChange': onPlayerStateChange
@@ -252,8 +383,20 @@
                     player.loadVideoById(videoId);
                 }
 
-                player.pauseVideo();
-                emitVideoInfo(CURRENT_USER, VIDEO_ID, 0, true);
+                // if (IS_PLAYER_READY) {
+                //     player.pauseVideo();
+                // }
+                
+                emitVideoInfo(CURRENT_USER, VIDEO_ID, 0, false);
+
+                const messageInfo = {
+                    message: senderName + ' shared a video',
+                    sender_id: 'server_video',
+                    sender_name: '',
+                    message_id: create_UUID()
+                };
+
+                socket.emit('message_info', messageInfo);
             }
         }
 
@@ -266,87 +409,123 @@
             return videoId;
         }
 
-
         $(function () {
         //   var socket = io();
           $('form').submit(function(e){
             e.preventDefault(); // prevents page reloading
-            const messageText = $('#m').val().trim();
-            if (messageText != '') {
-                socket.emit('chat message', messageText);
+            const messageText = $('#message_input').val().trim();
+            const senderName = $("#sender-name-input").val().trim();
+            if (messageText != '' && senderName != '') {
+
+                const messageInfo = {
+                    message: messageText,
+                    sender_id: CURRENT_USER,
+                    sender_name: senderName,
+                    message_id: create_UUID()
+                };
+
+                socket.emit('message_info', messageInfo);
+                $('#message_input').val('');
+
             }
-            $('#m').val('');
+            
+            if (messageText == '') {
+                $('#message_input').val('');
+            }
+
+            if (senderName == '') {
+                $('#sender-name-input').css('background-color', '#ffc1bd');
+            }
+            
             return false;
           });
-          socket.on('chat message', function(msg){
-            $('#messages').append($('<li>').text(msg));
+
+          socket.on('message_info', function(messageInfo){
+
+            const message = messageInfo.message;
+            const senderId = messageInfo.sender_id;
+            const senderName = messageInfo.sender_name;
+            const messageId = messageInfo.message_id;
+
+            if (senderId != 'server_video' && senderId != 'server_user') {
+
+                let floatSide = 'left';
+                let backgroundColor = 'secondary';
+
+                if (senderId == CURRENT_USER) {
+                    floatSide = 'right';
+                    backgroundColor = 'primary';
+                }
+
+                $('#messages').append(`
+                    <div class="p-0 m-0 w-100 float-${floatSide}">
+                        <label class="text-left d-inline-block bg-${backgroundColor} text-light float-${floatSide} rounded m-1 pl-1 pr-1" style="word-break: break-all;">${message}</label>
+                    </div>
+                `);
+
+                $('#messages').append(`
+                    <div id=${messageId} class="p-0 m-0 w-100 float-${floatSide}">
+                        <label class="text-left d-inline-block bg-light text-dark float-${floatSide} rounded m-1 pl-1 pr-1 small" style="word-break: break-all;">${senderName}</label>
+                    </div>
+                `);
+
+            } else {
+
+                $('#messages').append(`
+                    <div class="p-0 m-0 w-100">
+                        <label class="text-left d-inline-block bg-light text-dark rounded m-1 pl-1 pr-1 small font-weight-bold" style="word-break: break-all;">${message}</label>
+                    </div>
+                `);
+                
+                if (senderId == 'server_user' && VIDEO_ID != '') {
+
+                    player.pauseVideo();
+
+                    const isPaused = true;
+                    // if (event.data == YT.PlayerState.PLAYING) {
+                    //     isPaused = false;
+                    // }
+
+                    const currentTime = getVideoTime();
+                    // if (event.data != YT.PlayerState.BUFFERING) {
+                    emitVideoInfo(CURRENT_USER, VIDEO_ID, currentTime, isPaused);
+                    // }
+                }
+            }
+
+            if (senderId == LAST_MESSAGE_INFO.sender_id) {
+                let senderDiv = document.getElementById(LAST_MESSAGE_INFO.message_id);
+                if (senderDiv !== null) {
+                    senderDiv.remove();
+                }
+            }
+
             let messagesDiv = document.getElementById("messages-div");
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            LAST_MESSAGE_INFO = messageInfo;
           });
 
 
-          socket.on('video info', function(info){
+          socket.on('video_info', function(info){
 
-            if (!IS_READY) {
+            GOT_INFO = info;
+            GOT_VIDEO_ID = info.video_id;
+            GOT_CURRENT_TIME = info.current_time;
+            GOT_IS_PAUSED = info.is_paused;
+
+            if (!IS_API_READY) {
                 return;
             }
 
 
 
-
-
-            const fromUser = info.from_user;
-            const videoId = info.video_id;
-            const currentTime = info.current_time;
-            const isPaused = info.is_paused;
-
-            if (fromUser != CURRENT_USER) {
-
-                GOT_VIDEO_ID = videoId;
-                GOT_CURRENT_TIME = currentTime;
-                GOT_IS_PAUSED = isPaused;
-
-                if (videoId != VIDEO_ID) {
-
-                    VIDEO_ID = videoId;
-
-                    if (player == null) {
-
-                        player = new YT.Player('player', {
-                            height: '337.5',
-                            width: '600',
-                            videoId: videoId,
-                            events: {
-                            'onReady': onPlayerReady,
-                            'onStateChange': onPlayerStateChange
-                            }
-                        });
-
-                    } else {
-                        player.loadVideoById(videoId);
-                    }
-
-                } else {
-
-                    player.seekTo(currentTime);
-
-                    if (isPaused) {
-                        player.pauseVideo();
-                    } else {
-                        player.playVideo();
-                    }
-                }
-            }
-
+            updateVideoPlayer(info);
 
 
 
             
           });
-
-
-
-
 
 
 
