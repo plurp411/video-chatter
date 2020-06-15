@@ -46,8 +46,20 @@ io.on('connection', function(socket){
 });
 
 io.on('connection', function(socket){
-  socket.on('is_typing_name', function(isTypingName){
-    io.emit('is_typing_name', isTypingName);
+  socket.on('video_url_cue', function(videoUrlCue){
+    io.emit('video_url_cue', videoUrlCue);
+  });
+});
+
+io.on('connection', function(socket){
+  socket.on('is_typing_info', function(isTypingInfo){
+    io.emit('is_typing_info', isTypingInfo);
+  });
+});
+
+io.on('connection', function(socket){
+  socket.on('is_buffering_info', function(isBufferingInfo){
+    io.emit('is_buffering_info', isBufferingInfo);
   });
 });
 

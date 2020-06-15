@@ -51,34 +51,38 @@
 
     </style>
   </head>
-  <!-- <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(80, 80, 80);"> -->
-  <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(60, 60, 60);"></body>
+  <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(80, 80, 80);">
+  <!-- <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(60, 60, 60);"></body> -->
 
     <div id="loading-div" class="row align-items-center h-100 w-100" style="background-color: rgb(60, 60, 60); z-index: 1;">
         <div class="col-12 text-center">
             <div class="spinner-border text-light"></div>
         </div>
-      </div>
-  
-      <div class="d-block h-100" id="all-div">
+    </div>
+
+    <div class="d-block h-100" id="all-div">
 
         <div class="float-left" style="width: 600px; height: 100vh;">
             <div class="w-100 h-100 text-center">
+
+                <div id="is-buffering-name-div" class="p-0 m-0 float-left position-absolute invisible" style="width: 600px; height: 337.5px; height: 337.5px; pointer-events: none; top: 65px;">
+                    <label id="is-buffering-name-label" class="text-center d-inline-block bg-white text-dark pl-1 pr-1 small rounded font-weight-bold"></label>
+                </div>
+
                 <div class="" style="width: 600px; height: 337.5px; background-color: black;">
                     <div id="player"></div>
                 </div>
+
                 <input type="text" class="form-control d-inline-block rounded-0 w-100" id="link-input" placeholder="Video Link"/>
-                <button class="btn w-100 d-inline-block rounded-0 font-weight-bold" id="submit-link-button" style="background-color: rgb(190, 190, 190); color: black;">Submit</button>
-
-
+                <button class="btn w-100 d-inline-block rounded-0 font-weight-bold" id="submit-link-button" style="background-color: rgb(190, 190, 190); color: black;">Add Video</button>
 
                 <div class="w-100" id="videos-div" style="height: calc(100% - 337.5px - 38px - 38px - 38px - 38px); overflow-x: hidden; overflow-y: auto;">
                     <ul class="list-group list-group-flush" id="videos"></ul>
                 </div>
 
-
-                <button class="invisible btn d-inline-block rounded-0 position-absolute font-weight-bold" id="next-video-button" style="width: 600px; left: 0px; bottom: 38px; background-color: rgb(190, 190, 190); color: black;">Next Video</button>
+                <button class="btn d-inline-block rounded-0 position-absolute font-weight-bold invisible" id="next-video-button" style="width: 600px; left: 0px; bottom: 38px; background-color: rgb(190, 190, 190); color: black;">Play Next</button>
                 <input type="text" class="form-control d-block rounded-0 position-absolute font-weight-bold invisible" id="sender-name-input" placeholder="Display Name" style="width: 600px; bottom: 0px; color: black;"/>
+            
             </div>
         </div>
   
@@ -116,7 +120,7 @@
                             <label id="is-typing-name-label" class="text-left d-block bg-white text-dark float-left pl-2 pr-2 small w-100 h-100" style="word-break: break-all;"></label>
                         </div>
 
-                        <div class="w-100 position-absolute" style="bottom: 0px; height: 38px">
+                        <div class="position-absolute" style="bottom: 0px; height: 38px; width: calc(100% - 600px);">
                             <!-- <form action="">
                                 <input type="text" class="form-control d-inline-block float-left rounded-0" id="message-input" placeholder="Message" autocomplete="off" style="width: 70%;"/>
                                 <button class="btn d-inline-block float-right rounded-0" style="width: 30%; background-color: rgb(190, 190, 190); color: black">Send</button>
@@ -138,7 +142,7 @@
             </div> -->
 
         </div>
-      </div>
+    </div>
     
     <script>
 
@@ -154,7 +158,11 @@
         let IS_API_READY = false;
         let IS_PLAYER_READY = false;
 
+        let IS_BUFFERING = false;
+
         let LAST_MESSAGE_INFO = {};
+
+        let VIDEO_URL_CUE = {};
 
         let socket = io();
 
@@ -174,6 +182,10 @@
                 return (c=='x' ? r :(r&0x3|0x8)).toString(16);
             });
             return uuid;
+        }
+
+        function isEmpty(obj) {
+            return Object.keys(obj).length === 0;
         }
 
         function updateVideoPlayer(info) {
@@ -239,6 +251,7 @@
 
             $("#loading-div").remove();
 
+            $("#next-video-button").removeClass('invisible');
             $("#sender-name-input").removeClass('invisible');
             $("#message-input").removeClass('invisible');
 
@@ -271,9 +284,20 @@
 
             const currentTime = getVideoTime();
             if (VIDEO_ID != GOT_VIDEO_ID || isPaused != GOT_IS_PAUSED || (Math.abs(currentTime - GOT_CURRENT_TIME) > 1)) {
-                if (event.data != YT.PlayerState.BUFFERING) {
+                // if (event.data != YT.PlayerState.BUFFERING) {
                     emitVideoInfo(CURRENT_USER, VIDEO_ID, currentTime, isPaused);
-                }
+                // }
+            }
+
+            if (event.data == YT.PlayerState.BUFFERING) {
+
+                IS_BUFFERING = true;
+                emitIsBufferingInfo(true);
+                
+            } else if (IS_BUFFERING) {
+
+                IS_BUFFERING = false;
+                emitIsBufferingInfo(false);
             }
         }
         
@@ -295,8 +319,56 @@
             socket.emit('video_info', videoInfo);
         }
 
-        function emitIsTypingName(isTypingName) {
-            socket.emit('is_typing_name', isTypingName);
+        function emitIsTypingInfo(isTyping) {
+            const isTypingInfo = {
+                is_typing_name: getCurrentSenderName(),
+                is_typing_user: CURRENT_USER,
+                is_typing: isTyping
+            };
+            socket.emit('is_typing_info', isTypingInfo);
+        }
+
+        function emitIsBufferingInfo(isBuffering) {
+            const isBufferingInfo = {
+                is_buffering_name: getCurrentSenderName(),
+                is_buffering_user: CURRENT_USER,
+                is_buffering: isBuffering
+            };
+            socket.emit('is_buffering_info', isBufferingInfo);
+        }
+
+        function emitVideoUrlCue(videoUrlCue) {
+            socket.emit('video_url_cue', videoUrlCue);
+        }
+
+        function handleSubmitLink() {
+
+            const senderName = getCurrentSenderName();
+            if (senderName == '') {
+                $('#sender-name-input').css('background-color', '#ffc1bd');
+                return;
+            }
+
+            const videoLink = $("#link-input").val().trim();
+            const videoId = getVideoIdFromLink(videoLink);
+
+            if (!videoId || videoId == VIDEO_ID || videoLink in VIDEO_URL_CUE) {
+                return;
+            }
+
+            VIDEO_URL_CUE[videoLink] = senderName;
+            emitVideoUrlCue(VIDEO_URL_CUE);
+
+            $("#link-input").val('');
+
+            const messageInfo = {
+                message: senderName + " added a video",
+                sender_id: 'server_video',
+                sender_name: '',
+                message_id: create_UUID()
+            };
+
+            socket.emit('message_info', messageInfo);
         }
 
         $('#link-input').bind('keypress', function(e) {
@@ -306,40 +378,52 @@
         });
 
         $("#submit-link-button").click(function() {
-
             handleSubmitLink();
-
-            // const videoLink = $("#link-input").val().trim();
-            // const videoId = getVideoIdFromLink(videoLink);
-
-            // if (!videoId) {
-            //     return;
-            // }
-
-            // $('#videos').append(`
-            //     <li class="list-group-item small text-left" style="background-color: rgb(60, 60, 60); color: rgb(235, 235, 235);">${videoLink}</li>
-            // `);
         });
+
+        $("#next-video-button").click(function() {
+
+            const senderName = getCurrentSenderName();
+            if (senderName == '') {
+                $('#sender-name-input').css('background-color', '#ffc1bd');
+                return;
+            }
+
+            if (isEmpty(VIDEO_URL_CUE)) {
+                return;
+            }
+
+            const videoLink = Object.keys(VIDEO_URL_CUE)[0];
+            const videoLinkSenderName = VIDEO_URL_CUE[videoLink];
+            handleStartVideo(videoLink, videoLinkSenderName);
+            
+            delete VIDEO_URL_CUE[videoLink];
+            emitVideoUrlCue(VIDEO_URL_CUE);
+        })
 
         $('#sender-name-input').on('focus', function() {
             $('#sender-name-input').css('background-color', 'white');
         });
 
         $('#message-input').on('input', function() {
+
             const senderName = getCurrentSenderName();
             if (senderName == '') {
                 return;
             }
-            emitIsTypingName(senderName);
+
+            emitIsTypingInfo(true);
         });
 
         $('#message-input').on('keyup', function() {
+
             const senderName = getCurrentSenderName();
             if (senderName == '') {
                 return;
             }
+
             delay(function() {
-                emitIsTypingName('');
+                emitIsTypingInfo(false);
             }, 1000);
         });
 
@@ -357,19 +441,17 @@
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
 
+        function scrollToBottomVideoUrlCue() {
+            const videoUrlCue = document.getElementById("videos-div");
+            videoUrlCue.scrollTop = videoUrlCue.scrollHeight;
+        }
+
         function getCurrentSenderName() {
             return $("#sender-name-input").val().trim();
         }
 
-        function handleSubmitLink() {
-            
-            const senderName = getCurrentSenderName();
-            if (senderName == '') {
-                $('#sender-name-input').css('background-color', '#ffc1bd');
-                return;
-            }
+        function handleStartVideo(videoLink, videoLinkSenderName) {
 
-            const videoLink = $("#link-input").val().trim();
             const videoId = getVideoIdFromLink(videoLink);
 
             if (videoId != VIDEO_ID) {
@@ -399,8 +481,9 @@
                 
                 emitVideoInfo(CURRENT_USER, VIDEO_ID, 0, false);
 
+                const senderName = getCurrentSenderName();
                 const messageInfo = {
-                    message: senderName + ' shared a video',
+                    message: senderName + " started " + videoLinkSenderName + "'s video",
                     sender_id: 'server_video',
                     sender_name: '',
                     message_id: create_UUID()
@@ -437,9 +520,10 @@
                     };
 
                     socket.emit('message_info', messageInfo);
-                    emitIsTypingName('');
-                    $('#message-input').val('');
 
+                    emitIsTypingInfo(false);
+
+                    $('#message-input').val('');
                 }
                 
                 if (messageText == '') {
@@ -453,15 +537,56 @@
                 return false;
             });
 
-            socket.on('is_typing_name', function(isTypingName) {
+            socket.on('video_url_cue', function(videoUrlCue) {
+
+                VIDEO_URL_CUE = videoUrlCue;
+
+                $('#videos').html('');
+
+                let lastVideoUrlSenderName = '';
+                let position = 0;
+                for (const [key, value] of Object.entries(videoUrlCue)) {
+                    position++;
+                    const videoLink = key;
+                    const senderName = value;
+                    $('#videos').append(`
+                        <div class="list-group-item p-0" style="background-color: rgb(60, 60, 60);">
+
+                            <div class="float-left d-inline-block" style="width: 40px; height: 61px;">
+                                <label class="text-white h-100 w-100 font-weight-bold" style="text-align: center; line-height: 61px;">${position}</label>
+                            </div>
+
+                            <div class="float-right d-inline-block p-1 pr-0 pl-0" style="width: calc(100% - 40px)">
+                                <label class="small text-left d-inline-block float-left w-100 m-1 font-italic text-truncate" style="color: rgb(235, 235, 235); max-width: calc(550px - 14px);">${videoLink}</label>
+                                <label class="text-left d-inline-block bg-light text-dark float-left rounded m-1 pl-1 pr-1 small text-truncate" style="max-width: calc(550px - 14px);">${senderName}</label>
+                            </div>
+
+                        </div>
+                    `);
+                    lastVideoUrlSenderName = senderName;
+                }
+
+                // if (lastVideoUrlSenderName == getCurrentSenderName()) {
+                scrollToBottomVideoUrlCue();
+                // }
+            });
+
+            socket.on('is_typing_info', function(isTypingInfo) {
+
+                const isTyping = isTypingInfo.is_typing;
+                const isTypingUser = isTypingInfo.is_typing_user;
+                const isTypingName = isTypingInfo.is_typing_name;
+
+                if (isTypingUser == CURRENT_USER) {
+                    return;
+                }
 
                 $('#is-typing-name-div').removeClass('visible');
                 $('#is-typing-name-div').addClass('invisible');
 
                 // $('#messages-div').css('height', 'calc(100% - 38px)');
                 
-                const senderName = getCurrentSenderName();
-                if (isTypingName != '' && isTypingName != senderName) {
+                if (isTyping) {
 
                     $('#is-typing-name-label').text(isTypingName + " is typing...");
 
@@ -470,6 +595,32 @@
 
                     // $('#messages-div').css('height', 'calc(100% - 38px - 23px)');
                     // scrollToBottom();
+                }
+            });
+
+            socket.on('is_buffering_info', function(isBufferingInfo) {
+
+                const isBuffering = isBufferingInfo.is_buffering;
+                const isBufferingUser = isBufferingInfo.is_buffering_user;
+                const isBufferingName = isBufferingInfo.is_buffering_name;
+
+                if (isBufferingUser == CURRENT_USER) {
+                    return;
+                }
+
+                $('#is-buffering-name-div').removeClass('visible');
+                $('#is-buffering-name-div').addClass('invisible');
+
+                if (isBuffering) {
+
+                    if (isBufferingName == '') {
+                        $('#is-buffering-name-label').text("A user is buffering...");
+                    } else {
+                        $('#is-buffering-name-label').text(isBufferingName + " is buffering...");
+                    }
+
+                    $('#is-buffering-name-div').removeClass('invisible');
+                    $('#is-buffering-name-div').addClass('visible');
                 }
             });
 
@@ -516,19 +667,26 @@
                         </div>
                     `);
                     
-                    if (senderId == 'server_user' && VIDEO_ID != '') {
+                    if (senderId == 'server_user') {
 
-                        player.pauseVideo();
+                        if (VIDEO_ID != '') {
+                            
+                            player.pauseVideo();
 
-                        const isPaused = true;
-                        // if (event.data == YT.PlayerState.PLAYING) {
-                        //     isPaused = false;
-                        // }
+                            const isPaused = true;
+                            // if (event.data == YT.PlayerState.PLAYING) {
+                            //     isPaused = false;
+                            // }
 
-                        const currentTime = getVideoTime();
-                        // if (event.data != YT.PlayerState.BUFFERING) {
-                        emitVideoInfo(CURRENT_USER, VIDEO_ID, currentTime, isPaused);
-                        // }
+                            const currentTime = getVideoTime();
+                            // if (event.data != YT.PlayerState.BUFFERING) {
+                            emitVideoInfo(CURRENT_USER, VIDEO_ID, currentTime, isPaused);
+                            // }
+                        }
+                        
+                        if (!isEmpty(VIDEO_URL_CUE)) {
+                            emitVideoUrlCue(VIDEO_URL_CUE);
+                        }
                     }
                 }
 
