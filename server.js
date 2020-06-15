@@ -18,7 +18,7 @@ app.get('/', function(req, res){
 });
 
 io.on('connection', (socket) => {
-  
+
     const messageInfo = {
       message: 'A user connected',
       sender_id: 'server_user',
@@ -43,6 +43,12 @@ io.on('connection', function(socket){
     socket.on('video_info', function(info){
       io.emit('video_info', info);
     });
+});
+
+io.on('connection', function(socket){
+  socket.on('is_typing_name', function(isTypingName){
+    io.emit('is_typing_name', isTypingName);
+  });
 });
 
 http.listen(port, function(){

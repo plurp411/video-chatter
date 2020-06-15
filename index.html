@@ -106,13 +106,20 @@
                             <div id="messages"></div>
                         </div>
 
-                        <div class="w-100 position-relative" style="bottom: 0px; height: 38px">
+                        <!-- <div id="is-typing-name-div" class="p-0 m-0 w-100 float-left">
+                            <label id="is-typing-name-label" class="text-left d-inline-block bg-light text-dark float-left rounded m-1 pl-1 pr-1 small" style="word-break: break-all;">bla blah is typing</label>
+                        </div> -->
+                        <div id="is-typing-name-div" class="p-0 m-0 w-100 float-left position-absolute invisible" style="bottom: 30px; height: 31px;">
+                            <label id="is-typing-name-label" class="text-left d-block bg-white text-dark float-left pl-2 pr-2 small w-100 h-100" style="word-break: break-all;"></label>
+                        </div>
+
+                        <div class="w-100 position-absolute" style="bottom: 0px; height: 38px">
                             <!-- <form action="">
-                                <input type="text" class="form-control d-inline-block float-left rounded-0" id="message_input" placeholder="Message" autocomplete="off" style="width: 70%;"/>
+                                <input type="text" class="form-control d-inline-block float-left rounded-0" id="message-input" placeholder="Message" autocomplete="off" style="width: 70%;"/>
                                 <button class="btn d-inline-block float-right rounded-0" style="width: 30%; background-color: rgb(190, 190, 190); color: black">Send</button>
                             </form> -->
                             <form action="">
-                                <input type="text" class="form-control d-inline-block float-left rounded-0 w-100" id="message_input" placeholder="Message" autocomplete="off"/>
+                                <input type="text" class="form-control d-inline-block float-left rounded-0 w-100" id="message-input" placeholder="Message" autocomplete="off"/>
                             </form>
                         </div>
                     <!-- </div> -->
@@ -245,7 +252,13 @@
 
 
 
-
+        var delay = (function() {
+            var timer = 0;
+            return function(callback, ms) {
+                clearTimeout (timer);
+                timer = setTimeout(callback, ms);
+            };
+        })();
 
 
 
@@ -324,6 +337,10 @@
             socket.emit('video_info', videoInfo);
         }
 
+        function emitIsTypingName(isTypingName) {
+            socket.emit('is_typing_name', isTypingName);
+        }
+
         $('#link-input').bind('keypress', function(e) {
             if (e.keyCode == 13) {
                 handleSubmitLink();
@@ -349,6 +366,34 @@
         $('#sender-name-input').on('focus', function() {
             $('#sender-name-input').css('background-color', 'white');
         });
+
+        $('#message-input').on('input', function() {
+            const senderName = $("#sender-name-input").val().trim();
+            if (senderName == '') {
+                return;
+            }
+            emitIsTypingName(senderName);
+        });
+
+        $('#message-input').on('keyup', function() {
+            const senderName = $("#sender-name-input").val().trim();
+            if (senderName == '') {
+                return;
+            }
+            delay(function() {
+                emitIsTypingName('');
+            }, 1000);
+        });
+
+        function messageLog(messageText) {
+            $('#messages').append(`
+                <div class="p-0 m-0 w-100 float-left">
+                    <label class="text-left d-inline-block bg-white text-dark float-left rounded m-1 pl-1 pr-1" style="word-break: break-all;">${messageText}</label>
+                </div>
+            `);
+            let messagesDiv = document.getElementById("messages-div");
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
 
         function handleSubmitLink() {
             
@@ -410,122 +455,148 @@
         }
 
         $(function () {
-        //   var socket = io();
-          $('form').submit(function(e){
-            e.preventDefault(); // prevents page reloading
-            const messageText = $('#message_input').val().trim();
-            const senderName = $("#sender-name-input").val().trim();
-            if (messageText != '' && senderName != '') {
 
-                const messageInfo = {
-                    message: messageText,
-                    sender_id: CURRENT_USER,
-                    sender_name: senderName,
-                    message_id: create_UUID()
-                };
+            //   var socket = io();
 
-                socket.emit('message_info', messageInfo);
-                $('#message_input').val('');
+            $('form').submit(function(e) {
+                e.preventDefault(); // prevents page reloading
+                const messageText = $('#message-input').val().trim();
+                const senderName = $("#sender-name-input").val().trim();
+                if (messageText != '' && senderName != '') {
 
-            }
-            
-            if (messageText == '') {
-                $('#message_input').val('');
-            }
+                    const messageInfo = {
+                        message: messageText,
+                        sender_id: CURRENT_USER,
+                        sender_name: senderName,
+                        message_id: create_UUID()
+                    };
 
-            if (senderName == '') {
-                $('#sender-name-input').css('background-color', '#ffc1bd');
-            }
-            
-            return false;
-          });
+                    socket.emit('message_info', messageInfo);
+                    emitIsTypingName('');
+                    $('#message-input').val('');
 
-          socket.on('message_info', function(messageInfo){
-
-            const message = messageInfo.message;
-            const senderId = messageInfo.sender_id;
-            const senderName = messageInfo.sender_name;
-            const messageId = messageInfo.message_id;
-
-            if (senderId != 'server_video' && senderId != 'server_user') {
-
-                let floatSide = 'left';
-                let backgroundColor = 'secondary';
-
-                if (senderId == CURRENT_USER) {
-                    floatSide = 'right';
-                    backgroundColor = 'primary';
                 }
-
-                $('#messages').append(`
-                    <div class="p-0 m-0 w-100 float-${floatSide}">
-                        <label class="text-left d-inline-block bg-${backgroundColor} text-light float-${floatSide} rounded m-1 pl-1 pr-1" style="word-break: break-all;">${message}</label>
-                    </div>
-                `);
-
-                $('#messages').append(`
-                    <div id=${messageId} class="p-0 m-0 w-100 float-${floatSide}">
-                        <label class="text-left d-inline-block bg-light text-dark float-${floatSide} rounded m-1 pl-1 pr-1 small" style="word-break: break-all;">${senderName}</label>
-                    </div>
-                `);
-
-            } else {
-
-                $('#messages').append(`
-                    <div class="p-0 m-0 w-100">
-                        <label class="text-left d-inline-block bg-light text-dark rounded m-1 pl-1 pr-1 small font-weight-bold" style="word-break: break-all;">${message}</label>
-                    </div>
-                `);
                 
-                if (senderId == 'server_user' && VIDEO_ID != '') {
-
-                    player.pauseVideo();
-
-                    const isPaused = true;
-                    // if (event.data == YT.PlayerState.PLAYING) {
-                    //     isPaused = false;
-                    // }
-
-                    const currentTime = getVideoTime();
-                    // if (event.data != YT.PlayerState.BUFFERING) {
-                    emitVideoInfo(CURRENT_USER, VIDEO_ID, currentTime, isPaused);
-                    // }
+                if (messageText == '') {
+                    $('#message-input').val('');
                 }
-            }
 
-            if (senderId == LAST_MESSAGE_INFO.sender_id) {
-                let senderDiv = document.getElementById(LAST_MESSAGE_INFO.message_id);
-                if (senderDiv !== null) {
-                    senderDiv.remove();
+                if (senderName == '') {
+                    $('#sender-name-input').css('background-color', '#ffc1bd');
                 }
-            }
+                
+                return false;
+            });
 
-            let messagesDiv = document.getElementById("messages-div");
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            socket.on('is_typing_name', function(isTypingName) {
 
-            LAST_MESSAGE_INFO = messageInfo;
-          });
+                $('#is-typing-name-div').removeClass('visible');
+                $('#is-typing-name-div').addClass('invisible');
+
+                // $('#messages-div').css('height', 'calc(100% - 38px)');
+                
+                const senderName = $("#sender-name-input").val().trim();
+                if (isTypingName != '' && isTypingName != senderName) {
+
+                    $('#is-typing-name-label').text(isTypingName + " is typing...");
+
+                    $('#is-typing-name-div').removeClass('invisible');
+                    $('#is-typing-name-div').addClass('visible');
+
+                    // $('#messages-div').css('height', 'calc(100% - 38px - 23px)');
+
+                    // let messagesDiv = document.getElementById("messages-div");
+                    // messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                }
+
+            });
+
+            socket.on('message_info', function(messageInfo) {
+
+                const message = messageInfo.message;
+                const senderId = messageInfo.sender_id;
+                const senderName = messageInfo.sender_name;
+                const messageId = messageInfo.message_id;
+
+                if (senderId != 'server_video' && senderId != 'server_user') {
+
+                    let floatSide = 'left';
+                    let backgroundColor = 'secondary';
+
+                    if (senderId == CURRENT_USER) {
+                        floatSide = 'right';
+                        backgroundColor = 'primary';
+                    }
+
+                    $('#messages').append(`
+                        <div class="p-0 m-0 w-100 float-${floatSide}">
+                            <label class="text-left d-inline-block bg-${backgroundColor} text-light float-${floatSide} rounded m-1 pl-1 pr-1" style="word-break: break-all;">${message}</label>
+                        </div>
+                    `);
+
+                    $('#messages').append(`
+                        <div id=${messageId} class="p-0 m-0 w-100 float-${floatSide}">
+                            <label class="text-left d-inline-block bg-light text-dark float-${floatSide} rounded m-1 pl-1 pr-1 small" style="word-break: break-all;">${senderName}</label>
+                        </div>
+                    `);
+
+                } else {
+
+                    $('#messages').append(`
+                        <div class="p-0 m-0 w-100">
+                            <label class="text-left d-inline-block bg-light text-dark rounded m-1 pl-1 pr-1 small font-weight-bold" style="word-break: break-all;">${message}</label>
+                        </div>
+                    `);
+                    
+                    if (senderId == 'server_user' && VIDEO_ID != '') {
+
+                        player.pauseVideo();
+
+                        const isPaused = true;
+                        // if (event.data == YT.PlayerState.PLAYING) {
+                        //     isPaused = false;
+                        // }
+
+                        const currentTime = getVideoTime();
+                        // if (event.data != YT.PlayerState.BUFFERING) {
+                        emitVideoInfo(CURRENT_USER, VIDEO_ID, currentTime, isPaused);
+                        // }
+                    }
+                }
+
+                if (senderId == LAST_MESSAGE_INFO.sender_id) {
+                    let senderDiv = document.getElementById(LAST_MESSAGE_INFO.message_id);
+                    if (senderDiv !== null) {
+                        senderDiv.remove();
+                    }
+                }
+
+                let messagesDiv = document.getElementById("messages-div");
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+                LAST_MESSAGE_INFO = messageInfo;
+            });
 
 
-          socket.on('video_info', function(info){
+            socket.on('video_info', function(info) {
 
-            GOT_INFO = info;
-            GOT_VIDEO_ID = info.video_id;
-            GOT_CURRENT_TIME = info.current_time;
-            GOT_IS_PAUSED = info.is_paused;
+                GOT_INFO = info;
+                GOT_VIDEO_ID = info.video_id;
+                GOT_CURRENT_TIME = info.current_time;
+                GOT_IS_PAUSED = info.is_paused;
 
-            if (!IS_API_READY) {
-                return;
-            }
-
-
-
-            updateVideoPlayer(info);
+                if (!IS_API_READY) {
+                    return;
+                }
 
 
 
-            
-          });
+                updateVideoPlayer(info);
+
+
+
+                
+            });
 
 
 
@@ -539,6 +610,7 @@
 
 
         });
+        
     </script>
 
   </body>
