@@ -57,7 +57,7 @@
   <label class="d-none" id="room-id-label"><%= id %></label>
   <label class="d-none" id="user-id-label"><%= machine_id %></label>
 
-  <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(80, 80, 80);">
+  <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(30, 30, 30);">
   <!-- <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(60, 60, 60);"></body> -->
 
     <div id="loading-div" class="row align-items-center h-100 w-100" style="background-color: rgb(60, 60, 60); z-index: 1;">
@@ -71,7 +71,7 @@
         <div class="float-left" style="width: 600px; height: 100vh;">
             <div class="w-100 h-100 text-center">
 
-                <div id="is-buffering-name-div" class="p-0 m-0 float-left position-absolute invisible" style="width: 600px; height: 337.5px; height: 337.5px; pointer-events: none; top: 65px;">
+                <div id="is-buffering-name-div" class="p-0 m-0 float-left position-absolute invisible" style="width: 600px; height: 337.5px; pointer-events: none; top: 65px;">
                     <label id="is-buffering-name-label" class="text-center d-inline-block bg-white text-dark pl-1 pr-1 small rounded font-weight-bold"></label>
                 </div>
 
@@ -82,8 +82,12 @@
                 <input type="text" class="form-control d-inline-block rounded-0 w-100" id="link-input" placeholder="Video Link"/>
                 <button class="btn w-100 d-inline-block rounded-0 font-weight-bold" id="submit-link-button" style="background-color: rgb(190, 190, 190); color: black;">Add Video</button>
 
-                <div class="w-100" id="videos-div" style="height: calc(100% - 337.5px - 38px - 38px - 38px - 38px); overflow-x: hidden; overflow-y: auto;">
+                <div class="w-100 d-none" id="videos-div" style="height: calc(100% - 337.5px - 38px - 38px - 38px - 38px); overflow-x: hidden; overflow-y: auto;">
                     <ul class="list-group list-group-flush" id="videos"></ul>
+                </div>
+
+                <div class="w-100" id="no-videos-div" style="height: calc(100% - 337.5px - 38px - 38px - 38px - 38px);">
+                    <label id="no-videos" class="text-center d-inline-block bg-white text-dark pl-1 pr-1 mt-3 small rounded font-weight-bold">No videos in cue</label>
                 </div>
 
                 <button class="btn d-inline-block rounded-0 position-absolute font-weight-bold invisible" id="next-video-button" style="width: 600px; left: 0px; bottom: 38px; background-color: rgb(190, 190, 190); color: black;">Play Next</button>
@@ -91,7 +95,7 @@
             
             </div>
         </div>
-  
+
         <div class="h-100 float-right d-inline-block text-center" style="width: calc(100% - 600px)">
   
             <!-- <div class="w-100 text-center">
@@ -598,6 +602,19 @@
                         </div>
                     `);
                     lastVideoUrlSenderName = senderName;
+                }
+
+                $('#videos-div').removeClass('d-block');
+                $('#videos-div').removeClass('d-none');
+                $('#no-videos-div').removeClass('d-block');
+                $('#no-videos-div').removeClass('d-none');
+
+                if (isEmpty(videoUrlCue)) {
+                    $('#videos-div').addClass('d-none');
+                    $('#no-videos-div').addClass('d-block');
+                } else {
+                    $('#videos-div').addClass('d-block');
+                    $('#no-videos-div').addClass('d-none');
                 }
 
                 // if (lastVideoUrlSenderName == CURRENT_NAME {

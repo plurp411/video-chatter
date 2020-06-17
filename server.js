@@ -2,6 +2,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 3000;
+var ip = require('ip');
 var url = require('url');
 const {machineId} = require('node-machine-id');
 app.engine('html', require('ejs').renderFile);
@@ -18,6 +19,21 @@ function create_UUID() {
   return uuid;
 }
 
+function encrypt(ipAddress) {
+  ipAddress = ipAddress.replace(/0/g, 'd');
+  ipAddress = ipAddress.replace(/1/g, 'w');
+  ipAddress = ipAddress.replace(/2/g, 'ee');
+  ipAddress = ipAddress.replace(/3/g, 'rt');
+  ipAddress = ipAddress.replace(/4/g, 'jhj');
+  ipAddress = ipAddress.replace(/5/g, 'nnb');
+  ipAddress = ipAddress.replace(/6/g, 'kmi');
+  ipAddress = ipAddress.replace(/7/g, 'po');
+  ipAddress = ipAddress.replace(/8/g, 'z');
+  ipAddress = ipAddress.replace(/9/g, 'aa');
+  ipAddress = ipAddress.replace(/\./g, 'l');
+  return ipAddress;
+}
+
 app.get('/', function(req, res, next){
 
   if (req.url == '/') {
@@ -27,20 +43,30 @@ app.get('/', function(req, res, next){
       httpText = "http://";
     }
 
-    machineId().then((gotId) => {
-      res.writeHead(301, { "Location": httpText + req.headers['host'] + '/?id=' + gotId });
-      return res.end();
-    });
+    // machineId().then((gotId) => {
+    //   res.writeHead(301, { "Location": httpText + req.headers['host'] + '/?id=' + gotId });
+    //   return res.end();
+    // });
+
+    const ipAddress = ip.address();
+    const encryptedIp = encrypt(ipAddress);
+    res.writeHead(301, { "Location": httpText + req.headers['host'] + '/?id=' + encryptedIp });
+    return res.end();
 
   } else {
 
     let passedData = url.parse(req.url,true).query;
     ROOM_ID = passedData.id;
 
-    machineId().then((gotId) => {
-      passedData['machine_id'] = gotId;
-      res.render(__dirname + '/index.html', passedData);
-    });
+    // machineId().then((gotId) => {
+    //   passedData['machine_id'] = gotId;
+    //   res.render(__dirname + '/index.html', passedData);
+    // });
+
+    const ipAddress = ip.address();
+    const encryptedIp = encrypt(ipAddress);
+    passedData['machine_id'] = encryptedIp;
+    res.render(__dirname + '/index.html', passedData);
   }
 });
 
@@ -58,6 +84,7 @@ io.on('connection', (socket) => {
     io.to(ROOM_ID).emit('message_info', messageInfo);
 
     socket.on('disconnect', () => {
+
       console.log('A user disconnected');
 
       const messageInfo = {
