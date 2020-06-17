@@ -87,7 +87,7 @@
                 </div>
 
                 <div class="w-100" id="no-videos-div" style="height: calc(100% - 337.5px - 38px - 38px - 38px - 38px);">
-                    <label id="no-videos" class="text-center d-inline-block bg-white text-dark pl-1 pr-1 mt-3 small rounded font-weight-bold">No videos in cue</label>
+                    <label id="no-videos" class="text-center d-inline-block bg-white text-dark pl-1 pr-1 mt-3 small rounded font-weight-bold">No videos in queue</label>
                 </div>
 
                 <button class="btn d-inline-block rounded-0 position-absolute font-weight-bold invisible" id="next-video-button" style="width: 600px; left: 0px; bottom: 38px; background-color: rgb(190, 190, 190); color: black;">Play Next</button>
@@ -175,7 +175,7 @@
 
         let LAST_MESSAGE_INFO = {};
 
-        let VIDEO_URL_CUE = {};
+        let VIDEO_URL_QUEUE = {};
 
         // let socket = io('/' + ROOM_ID);
         let socket = io();
@@ -359,8 +359,8 @@
             socket.emit('sender_name_change_info', senderNameChangeInfo);
         }
         
-        function emitVideoUrlCue(videoUrlCue) {
-            socket.emit('video_url_cue', videoUrlCue);
+        function emitVideoUrlQueue(videoUrlQueue) {
+            socket.emit('video_url_queue', videoUrlQueue);
         }
 
         function handleSubmitLink() {
@@ -373,12 +373,12 @@
             const videoLink = $("#link-input").val().trim();
             const videoId = getVideoIdFromLink(videoLink);
 
-            if (!videoId || videoId == VIDEO_ID || videoLink in VIDEO_URL_CUE) {
+            if (!videoId || videoId == VIDEO_ID || videoLink in VIDEO_URL_QUEUE) {
                 return;
             }
 
-            VIDEO_URL_CUE[videoLink] = CURRENT_NAME;
-            emitVideoUrlCue(VIDEO_URL_CUE);
+            VIDEO_URL_QUEUE[videoLink] = CURRENT_NAME;
+            emitVideoUrlQueue(VIDEO_URL_QUEUE);
 
             $("#link-input").val('');
 
@@ -410,16 +410,16 @@
                 return;
             }
 
-            if (isEmpty(VIDEO_URL_CUE)) {
+            if (isEmpty(VIDEO_URL_QUEUE)) {
                 return;
             }
 
-            const videoLink = Object.keys(VIDEO_URL_CUE)[0];
-            const videoLinkSenderName = VIDEO_URL_CUE[videoLink];
+            const videoLink = Object.keys(VIDEO_URL_QUEUE)[0];
+            const videoLinkSenderName = VIDEO_URL_QUEUE[videoLink];
             handleStartVideo(videoLink, videoLinkSenderName);
             
-            delete VIDEO_URL_CUE[videoLink];
-            emitVideoUrlCue(VIDEO_URL_CUE);
+            delete VIDEO_URL_QUEUE[videoLink];
+            emitVideoUrlQueue(VIDEO_URL_QUEUE);
         })
 
         $('#sender-name-input').on('focus', function() {
@@ -479,9 +479,9 @@
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
 
-        function scrollToBottomVideoUrlCue() {
-            const videoUrlCue = document.getElementById("videos-div");
-            videoUrlCue.scrollTop = videoUrlCue.scrollHeight;
+        function scrollToBottomVideoUrlQueue() {
+            const videoUrlQueue = document.getElementById("videos-div");
+            videoUrlQueue.scrollTop = videoUrlQueue.scrollHeight;
         }
 
         function getCurrentSenderName() {
@@ -513,9 +513,12 @@
                     player.loadVideoById(videoId);
                 }
 
-                // if (IS_PLAYER_READY) {
-                //     player.pauseVideo();
-                // }
+                if (IS_PLAYER_READY) {
+                    player.playVideo();
+                } else {
+                    GOT_CURRENT_TIME = 0;
+                    GOT_IS_PAUSED = false;
+                }
                 
                 emitVideoInfo(CURRENT_USER, VIDEO_ID, 0, false);
 
@@ -575,15 +578,15 @@
                 return false;
             });
 
-            socket.on('video_url_cue', function(videoUrlCue) {
+            socket.on('video_url_queue', function(videoUrlQueue) {
 
-                VIDEO_URL_CUE = videoUrlCue;
+                VIDEO_URL_QUEUE = videoUrlQueue;
 
                 $('#videos').html('');
 
                 let lastVideoUrlSenderName = '';
                 let position = 0;
-                for (const [key, value] of Object.entries(videoUrlCue)) {
+                for (const [key, value] of Object.entries(videoUrlQueue)) {
                     position++;
                     const videoLink = key;
                     const senderName = value;
@@ -609,7 +612,7 @@
                 $('#no-videos-div').removeClass('d-block');
                 $('#no-videos-div').removeClass('d-none');
 
-                if (isEmpty(videoUrlCue)) {
+                if (isEmpty(videoUrlQueue)) {
                     $('#videos-div').addClass('d-none');
                     $('#no-videos-div').addClass('d-block');
                 } else {
@@ -618,7 +621,7 @@
                 }
 
                 // if (lastVideoUrlSenderName == CURRENT_NAME {
-                scrollToBottomVideoUrlCue();
+                scrollToBottomVideoUrlQueue();
                 // }
             });
 
@@ -750,8 +753,8 @@
                             // }
                         }
                         
-                        if (!isEmpty(VIDEO_URL_CUE)) {
-                            emitVideoUrlCue(VIDEO_URL_CUE);
+                        if (!isEmpty(VIDEO_URL_QUEUE)) {
+                            emitVideoUrlQueue(VIDEO_URL_QUEUE);
                         }
                     }
                 }

@@ -1,6 +1,12 @@
 var app = require('express')();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+// var io = require('socket.io')(http);
+
+var io = require('socket.io').listen(http, {
+  pingTimeout: 5000,
+  pingInterval: 10000
+});
+
 var port = process.env.PORT || 3000;
 var ip = require('ip');
 var url = require('url');
@@ -115,8 +121,8 @@ io.on('connection', function(socket){
 
 io.on('connection', function(socket){
   socket.join(ROOM_ID);
-  socket.on('video_url_cue', function(videoUrlCue){
-    io.to(ROOM_ID).emit('video_url_cue', videoUrlCue);
+  socket.on('video_url_queue', function(videoUrlQueue){
+    io.to(ROOM_ID).emit('video_url_queue', videoUrlQueue);
   });
 });
 
