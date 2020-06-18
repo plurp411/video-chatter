@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html class="h-100 w-100 overflow-hidden">
+  <head>
+    <title>Video Chat</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- <link rel="icon" type="image/png" href="favicon.ico"> -->
+    
+    <!-- <script src="jquery-3.5.1.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+<!--     <link rel="stylesheet" type="text/css" href="/index.css">
+    <link rel="stylesheet" type="text/css" href="/splitjs.css"> -->
+    
+    <style>
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        .btn {
+            background-color: rgb(52, 52, 52) !important;
+            color: rgb(220, 220, 220) !important;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn, .btn:focus, .btn:active {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .form-control, .form-control:focus, .form-control:active {
+            -webkit-box-shadow: none !important;
+            box-shadow: none !important;
+            border: 0px !important;
+        }
+
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgb(138, 138, 138, 0.3); 
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgb(138, 138, 138, 0.4); 
+        }
+
+/*        #sender-name-input::placeholder {
+            color: black;
+            opacity: 0.8;
+        }*/
+
+        .form-control::placeholder {
+            color: white;
+            opacity: 0.7;
+        }
+
+        .form-control {
+            background-color: rgb(40, 40, 40);
+            color: rgb(235, 235, 235);
+        }
+
+        #message-input {
+            background-color: rgb(35, 35, 35) !important;
+            color: rgb(235, 235, 235) !important;
+        }
+
+        #left-side, #right-side {
+            float: left;
+        }
+
+/*        .gutter.logo-gutter {
+            background-color: #34495E;
+        }*/
+
+        .gutter {
+            float: left;
+            background-color: rgb(55, 55, 55);
+            cursor: ew-resize;
+        }
+
+    </style>
+  </head>
+
+  <label class="d-none" id="room-id-label"><%= id %></label>
+  <label class="d-none" id="user-id-label"><%= machine_id %></label>
+
+  <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(30, 30, 30);">
+  <!-- <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(60, 60, 60);"></body> -->
+
+    <div id="loading-div" class="row align-items-center h-100 w-100" style="background-color: rgb(60, 60, 60); z-index: 1;">
+        <div class="col-12 text-center">
+            <div class="spinner-border text-light"></div>
+        </div>
+    </div>
+
+<!--     <div class="d-block h-100" id="all-div">
+ -->
+        <div id="left-side" style="height: 100vh; max-width: calc(100% - 204px); min-width: 200px;">
+            <div class="w-100 h-100 text-center" style="display: flex; flex-direction: column;">
+
+
+
+<!--                <div class="" style="width: 600px; height: 337.5px; background-color: black;">
+
+                     <div id="player"></div>
+
+                    <iframe id="existing-iframe-example"
+                        width="100%" height="360"
+                        src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1"
+                        frameborder="0"
+                        style="border: solid 4px #37474F"
+                    ></iframe>
+
+                </div>
+ -->
+
+
+
+                <div class="embed-responsive embed-responsive-16by9" style="flex-shrink: 1; background-color: black;">
+
+                    <div id="is-buffering-name-div" class="p-0 m-0 float-left position-absolute invisible w-100" style="pointer-events: none; top: 25%;">
+                        <label id="is-buffering-name-label" class="text-center d-inline-block bg-white text-dark pl-1 pr-1 small rounded font-weight-bold"></label>
+                    </div>
+
+                    <div id="player"></div>
+                </div>
+
+
+
+
+
+                <input type="text" class="form-control d-inline-block rounded-0 w-100" id="link-input" placeholder="Video Link" style="background-color: rgb(40, 40, 40); color: rgb(235, 235, 235);"/>
+                <button class="btn w-100 d-inline-block rounded-0 font-weight-normal" id="submit-link-button" style="">Add Video</button>
+
+                <div class="w-100 d-none" id="videos-div" style="flex-grow: 1; overflow-x: hidden; overflow-y: auto;">
+                    <div style="height: 0px;">
+                        <ul class="list-group list-group-flush" id="videos"></ul>
+                    </div>
+                </div>
+
+                <div class="w-100" id="no-videos-div" style="flex-grow: 1;">
+                    <label id="no-videos" class="text-center d-inline-block pl-1 pr-1 mt-3 mb-3 small rounded font-weight-bold" style="background-color: rgb(45, 45, 45); color: rgb(90, 90, 90);">No videos in queue</label>
+                </div>
+
+                <button class="btn w-100 d-inline-block rounded-0 position-relative font-weight-normal invisible" id="next-video-button" style="left: 0px; bottom: 0px;">Play Next</button>
+                <input type="text" class="form-control w-100 d-block rounded-0 position-relative invisible" id="sender-name-input" placeholder="Display Name" style="bottom: 0px;"/>
+            
+            </div>
+        </div>
+
+        <div id="right-side" style="height: 100vh; max-width: calc(100% - 204px); min-width: 200px;">
+  
+            <!-- <div class="w-100 text-center">
+                <input type="text" class="form-control d-inline-block" id="link-input" placeholder="Video Url" style="max-width: 600px;"/>
+            </div>
+            <div class="w-100 text-center">
+                <button class="btn btn-secondary mt-2 w-100 d-inline-block" id="submit-link-button" style="max-width: 600px;">Submit</button>
+            </div> -->
+
+            <!-- <div>
+                <ul id="messages"></ul>
+                <form action="">
+                    <input id="m" autocomplete="off" /><button>Send</button>
+                </form>
+            </div> -->
+            
+            <div class="w-100 text-center">
+                <div class="w-100" style="height: 100vh; background-color: rgb(25, 25, 25);">
+
+                    <!-- 467px -->
+                
+                    <!-- <div class="p-2"> -->
+
+                        <div class="w-100" id="messages-div" style="height: calc(100% - 38px); overflow-x: hidden; overflow-y: auto;">
+                            <div id="messages"></div>
+                        </div>
+
+                        <!-- <div id="is-typing-name-div" class="p-0 m-0 w-100 float-left">
+                            <label id="is-typing-name-label" class="text-left d-inline-block bg-light text-dark float-left rounded m-1 pl-1 pr-1 small" style="word-break: break-all;">bla blah is typing</label>
+                        </div> -->
+                        <div id="is-typing-name-div" class="p-0 m-0 w-100 float-left position-absolute invisible" style="bottom: 30px; height: 31px;">
+                            <label id="is-typing-name-label" class="text-left d-block bg-white text-dark float-left pl-2 pr-2 small w-100 h-100" style="word-break: break-all;"></label>
+                        </div>
+
+                        <div class="position-relative" style="bottom: 0px; height: 38px; width: 100%;">
+                            <!-- <form action="">
+                                <input type="text" class="form-control d-inline-block float-left rounded-0" id="message-input" placeholder="Message" autocomplete="off" style="width: 70%;"/>
+                                <button class="btn d-inline-block float-right rounded-0" style="width: 30%; background-color: rgb(190, 190, 190); color: black">Send</button>
+                            </form> -->
+                            <form action="">
+                                <input type="text" class="form-control d-inline-block float-left rounded-0 w-100 invisible" id="message-input" placeholder="Message" autocomplete="off"/>
+                            </form>
+                        </div>
+                    <!-- </div> -->
+
+                </div>
+            </div>
+
+            <!-- <div class="w-100 position-absolute bg-info" style="bottom: 0px; height: 100px">
+                <form action="" class="w-100">
+                    <input type="text" class="form-control w-100" id="m" placeholder="Message" autocomplete="off"/>
+                    <button>Send</button>
+                </form>
+            </div> -->
+
+        </div>
+<!--     </div>
+ -->    
+    <script async defer type="text/javascript" src="/web-font.js"></script>
+    <script type="text/javascript" src="/split.min.js"></script>
+    <script>
+
+        Split(['#left-side', '#right-side'], {
+            gutter: function (index, direction) {
+                var gutter = document.createElement('div')
+                gutter.className = 'gutter gutter-' + direction
+                gutter.style.height = '100vh'
+                return gutter
+            },
+            gutterSize: 4,
+        })
+
+    </script>
+
+    <script>
+
+        const ROOM_ID = $('#room-id-label').html();
+        const CURRENT_USER = $('#user-id-label').html();
+        // const CURRENT_USER = create_UUID();
+
+        let CURRENT_NAME = '';
+        let VIDEO_ID = '';
+
+        let GOT_INFO = null;
+        let GOT_VIDEO_ID;
+        let GOT_CURRENT_TIME;
+        let GOT_IS_PAUSED;
+
+        let IS_API_READY = false;
+        let IS_PLAYER_READY = false;
+
+        let IS_BUFFERING = false;
+
+        let LAST_MESSAGE_INFO = {};
+
+        let VIDEO_URL_QUEUE = {};
+
+        // let socket = io('/' + ROOM_ID);
+        let socket = io();
+
+        // load the IFrame Player API code asynchronously
+
+        let tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        let firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        let player = null;
+
+        function create_UUID() {
+            let dt = new Date().getTime();
+            let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                let r = (dt + Math.random()*16)%16 | 0;
+                dt = Math.floor(dt/16);
+                return (c=='x' ? r :(r&0x3|0x8)).toString(16);
+            });
+            return uuid;
+        }
+
+        function isEmpty(obj) {
+            return Object.keys(obj).length === 0;
+        }
+
+        function updateVideoPlayer(info) {
+
+            const fromUser = info.from_user;
+            const videoId = info.video_id;
+            const currentTime = info.current_time;
+            const isPaused = info.is_paused;
+
+            if (fromUser != CURRENT_USER) {
+
+                GOT_VIDEO_ID = videoId;
+                GOT_CURRENT_TIME = currentTime;
+                GOT_IS_PAUSED = isPaused;
+
+                if (videoId != VIDEO_ID) {
+
+                    VIDEO_ID = videoId;
+
+                    if (player === null) {
+
+                        player = new YT.Player('player', {
+                            videoId: videoId,
+                            playerVars: { 'autoplay': 1 },
+                            events: {
+                            'onReady': onPlayerReady,
+                            'onStateChange': onPlayerStateChange
+                            }
+                        });
+
+                    } else {
+                        player.loadVideoById(videoId);
+                    }
+
+                } else if (IS_PLAYER_READY) {
+
+                    player.seekTo(currentTime);
+
+                    if (isPaused) {
+                        player.pauseVideo();
+                    } else {
+                        player.playVideo();
+                    }
+
+                } else {
+                    GOT_CURRENT_TIME = currentTime;
+                    GOT_IS_PAUSED = isPaused;
+                }
+            }
+        }
+
+        let delay = (function() {
+            let timer = 0;
+            return function(callback, ms) {
+                clearTimeout (timer);
+                timer = setTimeout(callback, ms);
+            };
+        })();
+
+        function onYouTubeIframeAPIReady() {
+
+            $("#loading-div").remove();
+
+            $("#next-video-button").removeClass('invisible');
+            $("#sender-name-input").removeClass('invisible');
+            $("#message-input").removeClass('invisible');
+
+            IS_API_READY = true;
+            
+            if (GOT_INFO !== null) {
+                updateVideoPlayer(GOT_INFO);
+            }
+        }
+
+        function onPlayerReady(event) {
+
+            IS_PLAYER_READY = true;
+
+            player.seekTo(GOT_CURRENT_TIME);
+
+            if (GOT_IS_PAUSED) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
+        }
+
+        function onPlayerStateChange(event) {
+
+            let isPaused = true;
+            if (event.data == YT.PlayerState.PLAYING) {
+                isPaused = false;
+            }
+
+            const currentTime = getVideoTime();
+            if (VIDEO_ID != GOT_VIDEO_ID || isPaused != GOT_IS_PAUSED || (Math.abs(currentTime - GOT_CURRENT_TIME) > 1)) {
+                // if (event.data != YT.PlayerState.BUFFERING) {
+                    emitVideoInfo(CURRENT_USER, VIDEO_ID, currentTime, isPaused);
+                // }
+            }
+
+            if (event.data == YT.PlayerState.BUFFERING) {
+
+                IS_BUFFERING = true;
+                emitIsBufferingInfo(true);
+                
+            } else if (IS_BUFFERING) {
+
+                IS_BUFFERING = false;
+                emitIsBufferingInfo(false);
+            }
+        }
+        
+        function stopVideo() {
+            player.stopVideo();
+        }
+
+        function getVideoTime() {
+            return player.getCurrentTime();
+        }
+
+        function emitVideoInfo(fromUser, videoId, currentTime, isPaused) {
+            const videoInfo = {
+                from_user: fromUser,
+                video_id: videoId,
+                current_time: currentTime,
+                is_paused: isPaused
+            };
+            socket.emit('video_info', videoInfo);
+        }
+
+        function emitIsTypingInfo(isTyping) {
+            const isTypingInfo = {
+                is_typing_name: CURRENT_NAME,
+                is_typing_user: CURRENT_USER,
+                is_typing: isTyping
+            };
+            socket.emit('is_typing_info', isTypingInfo);
+        }
+
+        function emitIsBufferingInfo(isBuffering) {
+            const isBufferingInfo = {
+                is_buffering_name: CURRENT_NAME,
+                is_buffering_user: CURRENT_USER,
+                is_buffering: isBuffering
+            };
+            socket.emit('is_buffering_info', isBufferingInfo);
+        }
+
+        function emitSenderNameChangeInfo(currentSenderName) {
+            const senderNameChangeInfo = {
+                sender_name_change_user: CURRENT_USER,
+                sender_name_change_name: currentSenderName
+            };
+            socket.emit('sender_name_change_info', senderNameChangeInfo);
+        }
+        
+        function emitVideoUrlQueue(videoUrlQueue) {
+            socket.emit('video_url_queue', videoUrlQueue);
+        }
+
+        function handleSubmitLink() {
+
+            if (CURRENT_NAME == '') {
+                $('#sender-name-input').css('background-color', '#291a1a');
+                return;
+            }
+
+            const videoLink = $("#link-input").val().trim();
+            const videoId = getVideoIdFromLink(videoLink);
+
+            if (!videoId || videoId == VIDEO_ID || videoLink in VIDEO_URL_QUEUE) {
+                return;
+            }
+
+            VIDEO_URL_QUEUE[videoLink] = CURRENT_NAME;
+            emitVideoUrlQueue(VIDEO_URL_QUEUE);
+
+            $("#link-input").val('');
+
+            const messageInfo = {
+                message: " added a video",
+                sender_id: CURRENT_USER,
+                sender_name: CURRENT_NAME,
+                message_id: create_UUID(),
+                message_type: 'server_video'
+            };
+
+            socket.emit('message_info', messageInfo);
+        }
+
+        $('#link-input').bind('keypress', function(e) {
+            if (e.keyCode == 13) {
+                handleSubmitLink();
+            }
+        });
+
+        $("#submit-link-button").click(function() {
+            handleSubmitLink();
+        });
+
+        $("#next-video-button").click(function() {
+
+            if (CURRENT_NAME == '') {
+                $('#sender-name-input').css('background-color', '#291a1a');
+                return;
+            }
+
+            if (isEmpty(VIDEO_URL_QUEUE)) {
+                return;
+            }
+
+            const videoLink = Object.keys(VIDEO_URL_QUEUE)[0];
+            const videoLinkSenderName = VIDEO_URL_QUEUE[videoLink];
+            handleStartVideo(videoLink, videoLinkSenderName);
+            
+            delete VIDEO_URL_QUEUE[videoLink];
+            emitVideoUrlQueue(VIDEO_URL_QUEUE);
+        })
+
+        $('#sender-name-input').on('focus', function() {
+            $('#sender-name-input').css('background-color', 'rgb(40, 40, 40)');
+            $('#sender-name-input').css('color', 'rgb(235, 235, 235)');
+        });
+
+        function handleNewSenderName() {
+            const currentSenderName = getCurrentSenderName();
+            if (currentSenderName != '' && currentSenderName != CURRENT_NAME) {
+                emitSenderNameChangeInfo(currentSenderName);
+            }
+            CURRENT_NAME = currentSenderName;
+            $('#sender-name-input').val($('#sender-name-input').val().trim());
+        }
+
+        $('#sender-name-input').on('focusout', function() {
+            handleNewSenderName();
+        });
+
+        $('#sender-name-input').bind('keypress', function(e) {
+            if (e.keyCode == 13) {
+                handleNewSenderName();
+            }
+        });
+
+        $('#message-input').on('input', function() {
+
+            if (CURRENT_NAME == '') {
+                return;
+            }
+
+            emitIsTypingInfo(true);
+        });
+
+        $('#message-input').on('keyup', function() {
+
+            if (CURRENT_NAME == '') {
+                return;
+            }
+
+            delay(function() {
+                emitIsTypingInfo(false);
+            }, 1000);
+        });
+
+        function messageLog(messageText) {
+            $('#messages').append(`
+                <div class="p-0 m-0 w-100 float-left">
+                    <label class="text-left d-inline-block bg-white text-dark float-left rounded m-1 pl-1 pr-1" style="word-break: break-all;">${messageText}</label>
+                </div>
+            `);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            const messagesDiv = document.getElementById("messages-div");
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function scrollToBottomVideoUrlQueue() {
+            const videoUrlQueue = document.getElementById("videos-div");
+            videoUrlQueue.scrollTop = videoUrlQueue.scrollHeight;
+        }
+
+        function getCurrentSenderName() {
+            return $("#sender-name-input").val().trim();
+        }
+
+        function handleStartVideo(videoLink, videoLinkSenderName) {
+
+            const videoId = getVideoIdFromLink(videoLink);
+
+            if (videoId != VIDEO_ID) {
+
+                VIDEO_ID = videoId;
+
+                if (player === null) {
+
+                    player = new YT.Player('player', {
+                        videoId: videoId,
+                        playerVars: { 'autoplay': 1 },
+                        events: {
+                            'onReady': onPlayerReady,
+                            'onStateChange': onPlayerStateChange
+                        }
+                    });
+
+                } else {
+                    player.loadVideoById(videoId);
+                }
+
+                if (IS_PLAYER_READY) {
+                    player.playVideo();
+                } else {
+                    GOT_CURRENT_TIME = 0;
+                    GOT_IS_PAUSED = false;
+                }
+                
+                emitVideoInfo(CURRENT_USER, VIDEO_ID, 0, false);
+
+                const messageInfo = {
+                    message: " started " + videoLinkSenderName + "'s video",
+                    sender_id: CURRENT_USER,
+                    sender_name: CURRENT_NAME,
+                    message_id: create_UUID(),
+                    message_type: 'server_video'
+                };
+
+                socket.emit('message_info', messageInfo);
+            }
+        }
+
+        function getVideoIdFromLink(videoLink) {
+            let videoId = videoLink.split('v=')[1];
+            let ampersandPosition = videoId.indexOf('&');
+            if (ampersandPosition != -1) {
+                videoId = videoId.substring(0, ampersandPosition);
+            }
+            return videoId;
+        }
+
+        function emojiParse(text) {
+            // faces
+            // wink tongue
+            text = text.replace(/\;p/g, "&#128540;");
+            text = text.replace(/\;P/g, "&#128540;");
+            // wink
+            text = text.replace(/\;\)/g, "&#128521;");
+            // big smile
+            text = text.replace(/\:\>/g, "&#128522;");
+            // smile
+            text = text.replace(/\:\)/g, "&#128578;");
+            // sad
+            text = text.replace(/\:\(/g, "&#128577;");
+            // tongue
+            text = text.replace(/\:p/g, "&#128539;");
+            text = text.replace(/\:P/g, "&#128539;");
+            // kiss
+            text = text.replace(/\:\*/g, "&#128536;");
+            // neutral
+            text = text.replace(/\:\|/g, "&#128529;");
+            // open grin
+            text = text.replace(/\:D/g, "&#128512;");
+            // upside down smile
+            text = text.replace(/\(\:/g, "&#128579;");
+            // open mouth
+            text = text.replace(/\:o/g, "&#128558;");
+            // scared
+            text = text.replace(/\:O/g, "&#128561;");
+            // very angry
+            text = text.replace(/\>\>\:/g, "&#128545;");
+            // angry
+            text = text.replace(/\>\:/g, "&#128544;");
+            // thinking
+            text = text.replace(/\:\//g, "&#129300;");
+            text = text.replace(/\:\\/g, "&#129300;");
+            // more crying
+            text = text.replace(/\:\'\'\(/g, "&#128557;");
+            // crying
+            text = text.replace(/\:\'\(/g, "&#128546;");
+            // sleeping
+            text = text.replace(/zzz/g, "&#128564;");
+            // laughing
+            text = text.replace(/xD/g, "&#128514;");
+            text = text.replace(/XD/g, "&#128514;");
+
+            // other
+            // double hearts
+            text = text.replace(/\<33/g, "&#128149;");
+            // shiny heart
+            text = text.replace(/\<3\*/g, "&#128150;");
+            // spinning hearts
+            text = text.replace(/\<3\-3/g, "&#128158;");
+            // heart
+            text = text.replace(/\<3/g, "&#10084;");
+            return text;
+        }
+
+        $(function () {
+
+            $('form').submit(function(e) {
+
+                e.preventDefault(); // prevents page reloading
+
+                const messageText = $('#message-input').val().trim();
+                if (messageText != '' && CURRENT_NAME != '') {
+
+
+                    const emojiParsedMessageText = emojiParse(messageText);
+                    const messageInfo = {
+                        message: emojiParsedMessageText,
+                        sender_id: CURRENT_USER,
+                        sender_name: CURRENT_NAME,
+                        message_id: create_UUID(),
+                        message_type: 'user'
+                    };
+
+                    socket.emit('message_info', messageInfo);
+
+                    emitIsTypingInfo(false);
+
+                    $('#message-input').val('');
+                }
+                
+                if (messageText == '') {
+                    $('#message-input').val('');
+                }
+
+                if (CURRENT_NAME == '') {
+                    $('#sender-name-input').css('background-color', '#291a1a');
+                }
+                
+                return false;
+            });
+
+            socket.on('video_url_queue', function(videoUrlQueue) {
+
+                VIDEO_URL_QUEUE = videoUrlQueue;
+
+                $('#videos').html('');
+
+                let lastVideoUrlSenderName = '';
+                let position = 0;
+                for (const [key, value] of Object.entries(videoUrlQueue)) {
+                    position++;
+                    const videoLink = key;
+                    const senderName = value;
+                    $('#videos').append(`
+                        <div class="list-group-item p-0" style="background-color: rgb(60, 60, 60);">
+
+                            <div class="float-left d-inline-block" style="width: 40px; height: 61px;">
+                                <label class="text-white h-100 w-100 font-weight-bold" style="text-align: center; line-height: 61px;">${position}</label>
+                            </div>
+
+                            <div class="float-right d-inline-block p-1 pr-0 pl-0" style="width: calc(100% - 40px)">
+                                <label class="small text-left d-inline-block float-left w-100 m-1 font-italic text-truncate" style="color: rgb(235, 235, 235); max-width: calc(100% - 10px);">${videoLink}</label>
+                                <label class="text-left d-inline-block bg-light text-dark float-left rounded m-1 pl-1 pr-1 small text-truncate" style="max-width: calc(100% - 10px);">${senderName}</label>
+                            </div>
+
+                        </div>
+                    `);
+                    lastVideoUrlSenderName = senderName;
+                }
+
+                $('#videos-div').removeClass('d-block');
+                $('#videos-div').removeClass('d-none');
+                $('#no-videos-div').removeClass('d-block');
+                $('#no-videos-div').removeClass('d-none');
+
+                if (isEmpty(videoUrlQueue)) {
+                    $('#videos-div').addClass('d-none');
+                    $('#no-videos-div').addClass('d-block');
+                } else {
+                    $('#videos-div').addClass('d-block');
+                    $('#no-videos-div').addClass('d-none');
+                }
+
+                // if (lastVideoUrlSenderName == CURRENT_NAME {
+                scrollToBottomVideoUrlQueue();
+                // }
+            });
+
+            socket.on('is_typing_info', function(isTypingInfo) {
+
+                const isTyping = isTypingInfo.is_typing;
+                const isTypingUser = isTypingInfo.is_typing_user;
+                const isTypingName = isTypingInfo.is_typing_name;
+
+                if (isTypingUser == CURRENT_USER) {
+                    return;
+                }
+
+                $('#is-typing-name-div').removeClass('visible');
+                $('#is-typing-name-div').addClass('invisible');
+
+                // $('#messages-div').css('height', 'calc(100% - 38px)');
+                
+                if (isTyping) {
+
+                    $('#is-typing-name-label').text(isTypingName + " is typing...");
+
+                    $('#is-typing-name-div').removeClass('invisible');
+                    $('#is-typing-name-div').addClass('visible');
+
+                    // $('#messages-div').css('height', 'calc(100% - 38px - 23px)');
+                    // scrollToBottom();
+                }
+            });
+
+            socket.on('is_buffering_info', function(isBufferingInfo) {
+
+                const isBuffering = isBufferingInfo.is_buffering;
+                const isBufferingUser = isBufferingInfo.is_buffering_user;
+                const isBufferingName = isBufferingInfo.is_buffering_name;
+
+                if (isBufferingUser == CURRENT_USER) {
+                    return;
+                }
+
+                $('#is-buffering-name-div').removeClass('visible');
+                $('#is-buffering-name-div').addClass('invisible');
+
+                if (isBuffering) {
+
+                    if (isBufferingName == '') {
+                        $('#is-buffering-name-label').text("A user is buffering...");
+                    } else {
+                        $('#is-buffering-name-label').text(isBufferingName + " is buffering...");
+                    }
+
+                    $('#is-buffering-name-div').removeClass('invisible');
+                    $('#is-buffering-name-div').addClass('visible');
+                }
+            });
+
+            socket.on('sender_name_change_info', function(senderNameChangeInfo) {
+
+                const senderNameChangeUser = senderNameChangeInfo.sender_name_change_user;
+                const senderNameChangeName = senderNameChangeInfo.sender_name_change_name;
+
+                $('.' + senderNameChangeUser).html(senderNameChangeName);
+            });
+
+            socket.on('message_info', function(messageInfo) {
+
+                const message = messageInfo.message;
+                const senderId = messageInfo.sender_id;
+                const senderName = messageInfo.sender_name;
+                const messageId = messageInfo.message_id;
+                const messageType = messageInfo.message_type;
+
+                if (messageType != 'server_video' && messageType != 'server_user_connect' && messageType != 'server_user_disconnect') {
+
+                    let floatSide = 'left';
+                    let backgroundColor = 'secondary';
+
+                    if (senderId == CURRENT_USER) {
+                        floatSide = 'right';
+                        backgroundColor = 'primary';
+                    }
+
+                    // message text
+
+                    $('#messages').append(`
+                        <div class="p-0 m-0 w-100 float-${floatSide}">
+                            <label class="text-left d-inline-block bg-${backgroundColor} text-light float-${floatSide} rounded m-1 pl-1 pr-1" style="word-break: break-all;">${message}</label>
+                        </div>
+                    `);
+
+                    // sender name
+
+                    $('#messages').append(`
+                        <div id=${messageId} class="p-0 m-0 w-100 float-${floatSide}">
+                            <label class="${senderId} text-left d-inline-block bg-light text-dark float-${floatSide} rounded m-1 pl-1 pr-1 small" style="word-break: break-all;">${senderName}</label>
+                        </div>
+                    `);
+
+                } else {
+
+                    // server message
+
+                    $('#messages').append(`
+                        <div class="p-0 m-0 w-100">
+                            <label class="text-left d-inline-block bg-light text-dark rounded m-1 pl-1 pr-1 small font-weight-bold" style="word-break: break-all;">
+
+                                <label class="${senderId} d-inline-block h-100 p-0 m-0">${senderName}</label>
+
+                                ${message}
+
+                            </label>
+                        </div>
+                    `);
+                    
+                    if (messageType == 'server_user_connect') {
+
+                        if (VIDEO_ID != '') {
+                            
+                            // player.pauseVideo();
+
+                            const isPaused = true;
+                            if (event.data == YT.PlayerState.PLAYING) {
+                                isPaused = false;
+                            }
+
+                            const currentTime = getVideoTime();
+                            // if (event.data != YT.PlayerState.BUFFERING) {
+                            emitVideoInfo(CURRENT_USER, VIDEO_ID, currentTime, isPaused);
+                            // }
+                        }
+                        
+                        if (!isEmpty(VIDEO_URL_QUEUE)) {
+                            emitVideoUrlQueue(VIDEO_URL_QUEUE);
+                        }
+                    }
+                }
+
+                if (messageType == 'user' && senderId == LAST_MESSAGE_INFO.sender_id) {
+                    let senderDiv = document.getElementById(LAST_MESSAGE_INFO.message_id);
+                    if (senderDiv !== null) {
+                        senderDiv.remove();
+                    }
+                }
+
+                scrollToBottom();
+
+                LAST_MESSAGE_INFO = messageInfo;
+            });
+
+            socket.on('video_info', function(info) {
+
+                GOT_INFO = info;
+                GOT_VIDEO_ID = info.video_id;
+                GOT_CURRENT_TIME = info.current_time;
+                GOT_IS_PAUSED = info.is_paused;
+
+                if (!IS_API_READY) {
+                    return;
+                }
+
+                updateVideoPlayer(info);
+            });
+        });
+
+    </script>
+
+  </body>
+</html>
+

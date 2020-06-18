@@ -1,4 +1,8 @@
-var app = require('express')();
+// var app = require('express')();
+var express = require('express');
+var app = express();
+
+
 var http = require('http').Server(app);
 // var io = require('socket.io')(http);
 
@@ -12,6 +16,15 @@ var ip = require('ip');
 var url = require('url');
 const {machineId} = require('node-machine-id');
 app.engine('html', require('ejs').renderFile);
+
+
+// var express = express();
+app.use(express.static(__dirname + '/public'));
+// app.use('/', index);
+// app.use('/users', users);
+// app.use('/firstpage', firstpage);
+// app.use(express.static('routes');
+
 
 let ROOM_ID = '';
 
@@ -72,7 +85,7 @@ app.get('/', function(req, res, next){
     const ipAddress = ip.address();
     const encryptedIp = encrypt(ipAddress);
     passedData['machine_id'] = encryptedIp;
-    res.render(__dirname + '/index.html', passedData);
+    res.render(__dirname + '/index2.html', passedData);
   }
 });
 
