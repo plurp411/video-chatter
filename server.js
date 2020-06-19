@@ -84,8 +84,8 @@ app.get('/', function(req, res, next){
 
     const ipAddress = ip.address();
     const encryptedIp = encrypt(ipAddress);
-    // passedData['machine_id'] = encryptedIp;
-    passedData['machine_id'] = create_UUID();
+    passedData['machine_id'] = encryptedIp;
+    // passedData['machine_id'] = create_UUID();
     res.render(__dirname + '/index2.html', passedData);
   }
 });
@@ -114,8 +114,19 @@ io.on('connection', (socket) => {
         message_id: create_UUID(),
         message_type: 'server_user_disconnect'
       };
-  
       socket.broadcast.to(ROOM_ID).emit('message_info', messageInfo);
+      
+      const isBufferingInfo = {
+        is_buffering_name: 'server_clear_is_buffering',
+        is_buffering: false
+      };
+      socket.broadcast.to(ROOM_ID).emit('is_buffering_info', isBufferingInfo);
+
+      const isTypingInfo = {
+        is_typing_name: 'server_clear_is_typing',
+        is_typing: false
+      };
+      socket.broadcast.to(ROOM_ID).emit('is_typing_info', isTypingInfo);
     });
 });
 
