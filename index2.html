@@ -127,8 +127,8 @@
 
                 <div class="embed-responsive embed-responsive-16by9" style="flex-shrink: 1; background-color: black;">
 
-                    <div id="is-buffering-name-div" class="p-0 m-0 float-left position-absolute invisible w-100" style="pointer-events: none; top: 25%;">
-                        <label id="is-buffering-name-label" class="text-center d-inline-block bg-white text-dark pl-1 pr-1 small rounded font-weight-bold"></label>
+                    <div id="is-buffering-name-div" class="p-0 m-0 float-left position-absolute invisible w-100" style="pointer-events: none; top: calc(25% - 5px);">
+                        <label id="is-buffering-name-label" class="text-center d-inline-block pl-1 pr-1 small rounded font-weight-bold" style="background-color: rgb(60, 60, 60); color: rgb(150, 150, 150);"></label>
                     </div>
 
                     <div id="player"></div>
@@ -180,17 +180,17 @@
                 
                     <!-- <div class="p-2"> -->
 
-                        <div class="w-100" id="messages-div" style="height: calc(100% - 38px); overflow-x: hidden; overflow-y: auto;">
+                        <div class="w-100 pt-1 pb-1" id="messages-div" style="height: calc(100% - 38px); overflow-x: hidden; overflow-y: auto;">
                             <div id="messages"></div>
                         </div>
 
                         <!-- <div id="is-typing-name-div" class="p-0 m-0 w-100 float-left">
                             <label id="is-typing-name-label" class="text-left d-inline-block bg-light text-dark float-left rounded m-1 pl-1 pr-1 small" style="word-break: break-all;">bla blah is typing</label>
                         </div> -->
-                        <div id="is-typing-name-div" class="p-0 m-0 w-100 float-left position-absolute invisible" style="bottom: 30px; height: 31px;">
-                            <label id="is-typing-name-label" class="text-left d-block bg-white text-dark float-left pl-2 pr-2 small w-100 h-100" style="word-break: break-all;"></label>
+                        <div id="is-typing-name-div" class="p-0 m-0 w-100 float-left position-absolute invisible" style="bottom: 38px; height: 20px;">
+                            <label id="is-typing-name-label" class="text-left d-block float-left pl-2 pr-2 small w-100 h-100" style="word-break: break-all; line-height: 20px; background-color: rgb(40, 40, 40); color: rgb(235, 235, 235);"></label>
                         </div>
-
+                        
                         <div class="position-relative" style="bottom: 0px; height: 38px; width: 100%;">
                             <!-- <form action="">
                                 <input type="text" class="form-control d-inline-block float-left rounded-0" id="message-input" placeholder="Message" autocomplete="off" style="width: 70%;"/>
@@ -431,6 +431,7 @@
                 sender_name_change_user: CURRENT_USER,
                 sender_name_change_name: currentSenderName
             };
+            updateSenderName(senderNameChangeInfo);
             socket.emit('sender_name_change_info', senderNameChangeInfo);
         }
         
@@ -465,6 +466,7 @@
                 message_type: 'server_video'
             };
 
+            addMessage(messageInfo);
             socket.emit('message_info', messageInfo);
         }
 
@@ -521,12 +523,23 @@
             }
         });
 
+        $('#sender-name-input').on('input', function() {
+            const currentSenderName = $('#sender-name-input').val();
+            let newSenderName = emojiParse(currentSenderName);            
+            newSenderName = newSenderName.substring(0, 50);
+            $('#sender-name-input').val(newSenderName);
+        });
+
         $('#message-input').on('input', function() {
+
+            const currentMessageText = $('#message-input').val();
+            const newMessageText = emojiParse(currentMessageText);
+            $('#message-input').val(newMessageText);
 
             if (CURRENT_NAME == '') {
                 return;
             }
-
+            
             emitIsTypingInfo(true);
         });
 
@@ -604,6 +617,7 @@
                     message_type: 'server_video'
                 };
 
+                addMessage(messageInfo);
                 socket.emit('message_info', messageInfo);
             }
         }
@@ -620,58 +634,167 @@
         function emojiParse(text) {
             // faces
             // wink tongue
-            text = text.replace(/\;p/g, "&#128540;");
-            text = text.replace(/\;P/g, "&#128540;");
+            text = text.replace(/\;p/g, "😜");
+            text = text.replace(/\;P/g, "😜");
             // wink
-            text = text.replace(/\;\)/g, "&#128521;");
+            text = text.replace(/\;\)/g, "😉");
             // big smile
-            text = text.replace(/\:\>/g, "&#128522;");
+            text = text.replace(/\:\>/g, "😊");
             // smile
-            text = text.replace(/\:\)/g, "&#128578;");
+            text = text.replace(/\:\)/g, "🙂");
             // sad
-            text = text.replace(/\:\(/g, "&#128577;");
+            text = text.replace(/\:\(/g, "🙁 ");
             // tongue
-            text = text.replace(/\:p/g, "&#128539;");
-            text = text.replace(/\:P/g, "&#128539;");
+            text = text.replace(/\:p/g, "😛");
+            text = text.replace(/\:P/g, "😛");
             // kiss
-            text = text.replace(/\:\*/g, "&#128536;");
+            text = text.replace(/\:\*/g, "😘");
             // neutral
-            text = text.replace(/\:\|/g, "&#128529;");
+            text = text.replace(/\:\|/g, "😑");
             // open grin
-            text = text.replace(/\:D/g, "&#128512;");
+            text = text.replace(/\:D/g, "😀");
             // upside down smile
-            text = text.replace(/\(\:/g, "&#128579;");
+            text = text.replace(/\(\:/g, "🙃");
             // open mouth
-            text = text.replace(/\:o/g, "&#128558;");
+            text = text.replace(/\:o/g, "😮");
             // scared
-            text = text.replace(/\:O/g, "&#128561;");
+            text = text.replace(/\:O/g, "😱");
+            // super angry
+            text = text.replace(/\>\>\>\:/g, "😤");
             // very angry
-            text = text.replace(/\>\>\:/g, "&#128545;");
+            text = text.replace(/\>\>\:/g, "😡");
             // angry
-            text = text.replace(/\>\:/g, "&#128544;");
+            text = text.replace(/\>\:/g, "😠");
             // thinking
-            text = text.replace(/\:\//g, "&#129300;");
-            text = text.replace(/\:\\/g, "&#129300;");
+            // text = text.replace(/\:\//g, "🤔");
+            text = text.replace(/\:\\/g, "🤔");
             // more crying
-            text = text.replace(/\:\'\'\(/g, "&#128557;");
+            text = text.replace(/\:\'\'\(/g, "😭");
+            text = text.replace(/\:\"\(/g, "😭");
             // crying
-            text = text.replace(/\:\'\(/g, "&#128546;");
+            text = text.replace(/\:\'\(/g, "😢");
             // sleeping
-            text = text.replace(/zzz/g, "&#128564;");
+            text = text.replace(/z\:o/g, "😴");
+            text = text.replace(/z\:O/g, "😴");
+            // zzzs
+            text = text.replace(/zzz/g, "💤");
             // laughing
-            text = text.replace(/xD/g, "&#128514;");
-            text = text.replace(/XD/g, "&#128514;");
+            text = text.replace(/xD/g, "😂");
+            text = text.replace(/XD/g, "😂");
+            // teethy grin
+            text = text.replace(/\:\#/g, "😬");
+            // disappointed
+            text = text.replace(/D\:/g, "😦");
+            // zipper mouth
+            text = text.replace(/\:\$/g, "🤐");
+            // hush
+            text = text.replace(/\:\%/g, "🤫");
 
             // other
+            // dot heart
+            text = text.replace(/\.\<3/g, "❣");
             // double hearts
-            text = text.replace(/\<33/g, "&#128149;");
+            text = text.replace(/\<\<3/g, "💕");
             // shiny heart
-            text = text.replace(/\<3\*/g, "&#128150;");
+            text = text.replace(/\*\<3/g, "💖");
             // spinning hearts
-            text = text.replace(/\<3\-3/g, "&#128158;");
+            text = text.replace(/\<\-\<3/g, "💞");
             // heart
-            text = text.replace(/\<3/g, "&#10084;");
+            text = text.replace(/\<3/g, "❤");
             return text;
+        }
+
+        function addMessage(messageInfo) {
+            
+            const message = messageInfo.message;
+            const senderId = messageInfo.sender_id;
+            const senderName = messageInfo.sender_name;
+            const messageId = messageInfo.message_id;
+            const messageType = messageInfo.message_type;
+
+            if (messageType != 'server_video' && messageType != 'server_user_connect' && messageType != 'server_user_disconnect') {
+
+                let floatSide = 'left';
+                let backgroundColor = 'secondary';
+
+                if (senderId == CURRENT_USER) {
+                    floatSide = 'right';
+                    backgroundColor = 'primary';
+                }
+
+                // message text
+
+                $('#messages').append(`
+                    <div class="p-0 m-0 w-100 float-${floatSide}">
+                        <label class="text-left d-inline-block bg-${backgroundColor} text-light float-${floatSide} rounded m-1 pl-1 pr-1" style="word-break: break-all;">${message}</label>
+                    </div>
+                `);
+
+                // sender name
+
+                $('#messages').append(`
+                    <div id=${messageId} class="p-0 m-0 w-100 float-${floatSide}">
+                        <label class="${senderId} text-left d-inline-block bg-light text-dark float-${floatSide} rounded m-1 pl-1 pr-1 small" style="word-break: break-all;">${senderName}</label>
+                    </div>
+                `);
+
+            } else {
+
+                // server message
+
+                $('#messages').append(`
+                    <div class="p-0 m-0 w-100">
+                        <label class="text-left d-inline-block bg-light text-dark rounded m-1 pl-1 pr-1 small font-weight-bold" style="word-break: break-all;">
+
+                            <label class="${senderId} d-inline-block h-100 p-0 m-0">${senderName}</label>
+
+                            ${message}
+
+                        </label>
+                    </div>
+                `);
+                
+                if (messageType == 'server_user_connect') {
+
+                    if (VIDEO_ID != '') {
+                        
+                        // player.pauseVideo();
+
+                        const isPaused = true;
+                        if (event.data == YT.PlayerState.PLAYING) {
+                            isPaused = false;
+                        }
+
+                        const currentTime = getVideoTime();
+                        // if (event.data != YT.PlayerState.BUFFERING) {
+                        emitVideoInfo(CURRENT_USER, VIDEO_ID, currentTime, isPaused);
+                        // }
+                    }
+                    
+                    if (!isEmpty(VIDEO_URL_QUEUE)) {
+                        emitVideoUrlQueue(VIDEO_URL_QUEUE);
+                    }
+                }
+            }
+
+            if (messageType == 'user' && senderId == LAST_MESSAGE_INFO.sender_id) {
+                let senderDiv = document.getElementById(LAST_MESSAGE_INFO.message_id);
+                if (senderDiv !== null) {
+                    senderDiv.remove();
+                }
+            }
+
+            scrollToBottom();
+
+            LAST_MESSAGE_INFO = messageInfo;
+        }
+
+        function updateSenderName(senderNameChangeInfo) {
+
+            const senderNameChangeUser = senderNameChangeInfo.sender_name_change_user;
+            const senderNameChangeName = senderNameChangeInfo.sender_name_change_name;
+
+            $('.' + senderNameChangeUser).html(senderNameChangeName);
         }
 
         $(function () {
@@ -683,16 +806,15 @@
                 const messageText = $('#message-input').val().trim();
                 if (messageText != '' && CURRENT_NAME != '') {
 
-
-                    const emojiParsedMessageText = emojiParse(messageText);
                     const messageInfo = {
-                        message: emojiParsedMessageText,
+                        message: messageText,
                         sender_id: CURRENT_USER,
                         sender_name: CURRENT_NAME,
                         message_id: create_UUID(),
                         message_type: 'user'
                     };
 
+                    addMessage(messageInfo);
                     socket.emit('message_info', messageInfo);
 
                     emitIsTypingInfo(false);
@@ -780,7 +902,7 @@
                     $('#is-typing-name-div').removeClass('invisible');
                     $('#is-typing-name-div').addClass('visible');
 
-                    // $('#messages-div').css('height', 'calc(100% - 38px - 23px)');
+                    // $('#messages-div').css('height', 'calc(100% - 38px - 20px)');
                     // scrollToBottom();
                 }
             });
@@ -812,96 +934,11 @@
             });
 
             socket.on('sender_name_change_info', function(senderNameChangeInfo) {
-
-                const senderNameChangeUser = senderNameChangeInfo.sender_name_change_user;
-                const senderNameChangeName = senderNameChangeInfo.sender_name_change_name;
-
-                $('.' + senderNameChangeUser).html(senderNameChangeName);
+                updateSenderName(senderNameChangeInfo);
             });
 
             socket.on('message_info', function(messageInfo) {
-
-                const message = messageInfo.message;
-                const senderId = messageInfo.sender_id;
-                const senderName = messageInfo.sender_name;
-                const messageId = messageInfo.message_id;
-                const messageType = messageInfo.message_type;
-
-                if (messageType != 'server_video' && messageType != 'server_user_connect' && messageType != 'server_user_disconnect') {
-
-                    let floatSide = 'left';
-                    let backgroundColor = 'secondary';
-
-                    if (senderId == CURRENT_USER) {
-                        floatSide = 'right';
-                        backgroundColor = 'primary';
-                    }
-
-                    // message text
-
-                    $('#messages').append(`
-                        <div class="p-0 m-0 w-100 float-${floatSide}">
-                            <label class="text-left d-inline-block bg-${backgroundColor} text-light float-${floatSide} rounded m-1 pl-1 pr-1" style="word-break: break-all;">${message}</label>
-                        </div>
-                    `);
-
-                    // sender name
-
-                    $('#messages').append(`
-                        <div id=${messageId} class="p-0 m-0 w-100 float-${floatSide}">
-                            <label class="${senderId} text-left d-inline-block bg-light text-dark float-${floatSide} rounded m-1 pl-1 pr-1 small" style="word-break: break-all;">${senderName}</label>
-                        </div>
-                    `);
-
-                } else {
-
-                    // server message
-
-                    $('#messages').append(`
-                        <div class="p-0 m-0 w-100">
-                            <label class="text-left d-inline-block bg-light text-dark rounded m-1 pl-1 pr-1 small font-weight-bold" style="word-break: break-all;">
-
-                                <label class="${senderId} d-inline-block h-100 p-0 m-0">${senderName}</label>
-
-                                ${message}
-
-                            </label>
-                        </div>
-                    `);
-                    
-                    if (messageType == 'server_user_connect') {
-
-                        if (VIDEO_ID != '') {
-                            
-                            // player.pauseVideo();
-
-                            const isPaused = true;
-                            if (event.data == YT.PlayerState.PLAYING) {
-                                isPaused = false;
-                            }
-
-                            const currentTime = getVideoTime();
-                            // if (event.data != YT.PlayerState.BUFFERING) {
-                            emitVideoInfo(CURRENT_USER, VIDEO_ID, currentTime, isPaused);
-                            // }
-                        }
-                        
-                        if (!isEmpty(VIDEO_URL_QUEUE)) {
-                            emitVideoUrlQueue(VIDEO_URL_QUEUE);
-                        }
-                    }
-                }
-
-                if (messageType == 'user' && senderId == LAST_MESSAGE_INFO.sender_id) {
-                    let senderDiv = document.getElementById(LAST_MESSAGE_INFO.message_id);
-                    if (senderDiv !== null) {
-                        senderDiv.remove();
-                    }
-                }
-
-                scrollToBottom();
-
-                LAST_MESSAGE_INFO = messageInfo;
+                addMessage(messageInfo);
             });
 
             socket.on('video_info', function(info) {

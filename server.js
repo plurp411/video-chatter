@@ -84,7 +84,8 @@ app.get('/', function(req, res, next){
 
     const ipAddress = ip.address();
     const encryptedIp = encrypt(ipAddress);
-    passedData['machine_id'] = encryptedIp;
+    // passedData['machine_id'] = encryptedIp;
+    passedData['machine_id'] = create_UUID();
     res.render(__dirname + '/index2.html', passedData);
   }
 });
@@ -100,7 +101,7 @@ io.on('connection', (socket) => {
       message_type: 'server_user_connect'
     };
 
-    io.to(ROOM_ID).emit('message_info', messageInfo);
+    socket.broadcast.to(ROOM_ID).emit('message_info', messageInfo);
 
     socket.on('disconnect', () => {
 
@@ -114,49 +115,49 @@ io.on('connection', (socket) => {
         message_type: 'server_user_disconnect'
       };
   
-      io.to(ROOM_ID).emit('message_info', messageInfo);
+      socket.broadcast.to(ROOM_ID).emit('message_info', messageInfo);
     });
 });
 
 io.on('connection', function(socket){
   socket.join(ROOM_ID);
   socket.on('message_info', function(messageInfo){
-    io.to(ROOM_ID).emit('message_info', messageInfo);
+    socket.broadcast.to(ROOM_ID).emit('message_info', messageInfo);
   });
 });
 
 io.on('connection', function(socket){
   socket.join(ROOM_ID);
   socket.on('video_info', function(info){
-    io.to(ROOM_ID).emit('video_info', info);
+    socket.broadcast.to(ROOM_ID).emit('video_info', info);
   });
 });
 
 io.on('connection', function(socket){
   socket.join(ROOM_ID);
   socket.on('video_url_queue', function(videoUrlQueue){
-    io.to(ROOM_ID).emit('video_url_queue', videoUrlQueue);
+    socket.broadcast.to(ROOM_ID).emit('video_url_queue', videoUrlQueue);
   });
 });
 
 io.on('connection', function(socket){
   socket.join(ROOM_ID);
   socket.on('is_typing_info', function(isTypingInfo){
-    io.to(ROOM_ID).emit('is_typing_info', isTypingInfo);
+    socket.broadcast.to(ROOM_ID).emit('is_typing_info', isTypingInfo);
   });
 });
 
 io.on('connection', function(socket){
   socket.join(ROOM_ID);
   socket.on('is_buffering_info', function(isBufferingInfo){
-    io.to(ROOM_ID).emit('is_buffering_info', isBufferingInfo);
+    socket.broadcast.to(ROOM_ID).emit('is_buffering_info', isBufferingInfo);
   });
 });
 
 io.on('connection', function(socket){
   socket.join(ROOM_ID);
   socket.on('sender_name_change_info', function(senderNameChangeInfo){
-    io.to(ROOM_ID).emit('sender_name_change_info', senderNameChangeInfo);
+    socket.broadcast.to(ROOM_ID).emit('sender_name_change_info', senderNameChangeInfo);
   });
 });
 
