@@ -21,13 +21,20 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        /* * {
+            filter: invert(100%) !important;
+        } */
+
         .btn {
             background-color: rgb(52, 52, 52) !important;
             color: rgb(220, 220, 220) !important;
+            /* font-weight: bold !important; */
+            border-top: 1px solid rgb(10, 10, 10) !important;
+            border-bottom: 1px solid rgb(10, 10, 10) !important;
         }
 
         .btn:hover {
-            opacity: 0.9;
+            opacity: 0.85;
         }
 
         .btn, .btn:focus, .btn:active {
@@ -35,7 +42,7 @@
             box-shadow: none !important;
         }
 
-        .form-control, .form-control:focus, .form-control:active {
+        .form-control, .form-control:focus, .form-control:active, #link-display, #link-display:focus, #link-display:active {
             -webkit-box-shadow: none !important;
             box-shadow: none !important;
             border: 0px !important;
@@ -46,11 +53,11 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: rgb(138, 138, 138, 0.3); 
+            background: rgb(138, 138, 138, 0.2); 
         }
         
         ::-webkit-scrollbar-thumb {
-            background: rgb(138, 138, 138, 0.4); 
+            background: rgb(138, 138, 138, 0.2); 
         }
 
 /*        #sender-name-input::placeholder {
@@ -63,14 +70,42 @@
             opacity: 0.7;
         }
 
-        .form-control {
+        .form-control, #share-button, #link-display, #checkbox-div {
+            /* background-color: rgb(40, 40, 40) !important;
+            color: rgb(235, 235, 235) !important; */
             background-color: rgb(40, 40, 40);
             color: rgb(235, 235, 235);
         }
 
-        #message-input {
+        #checkbox-label:hover, #checkbox:hover {
+            cursor: pointer;
+        }
+
+        #link-display {
+            color: rgb(245, 245, 245) !important;
+        }
+
+        #message-input, #help-button {
             background-color: rgb(35, 35, 35) !important;
             color: rgb(235, 235, 235) !important;
+        }
+
+        #share-button {
+            /* border-right: 1px solid rgb(10, 10, 10) !important; */
+        }
+
+        #share-button, #help-button {
+            border-top: 0px !important;
+        }
+
+        #message-input {
+            border-top: 1px solid rgb(10, 10, 10) !important;
+        }
+
+        #share-actual-div {
+            background-color: rgb(40, 40, 40);
+            border: 4px solid rgb(10, 10, 10);
+            color: rgb(235, 235, 235);
         }
 
         #left-side, #right-side {
@@ -83,8 +118,18 @@
 
         .gutter {
             float: left;
-            background-color: rgb(55, 55, 55);
+            /* background-color: rgb(55, 55, 55); */
+            background-color: rgb(45, 45, 45);
             cursor: ew-resize;
+        }
+
+        .unselectable {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
     </style>
@@ -99,6 +144,25 @@
     <div id="loading-div" class="row align-items-center h-100 w-100" style="background-color: rgb(60, 60, 60); z-index: 1;">
         <div class="col-12 text-center">
             <div class="spinner-border text-light"></div>
+        </div>
+    </div>
+
+    <div id="share-cancel-div" class="w-100 h-100 position-absolute invisible" style="z-index: 1; opacity: 0.2; background-color: black;"></div>
+
+    <div id="share-div" class="w-100 position-absolute invisible" style="text-align: center; top: 20%; z-index: 1; pointer-events: none;">
+        <div id="share-actual-div" class="d-inline-block p-0 text-left" style="width: 350px; pointer-events: auto;">
+            
+            <!-- <label class="w-100 p-0 pt-2 pl-2 m-0" style="color:rgb(185, 185, 185);">Share this link:</label> -->
+            <div class="w-100 p-0 pt-2 pl-2 m-0 text-center">
+                <label class="unselectable text-center d-inline-block pl-1 pr-1 m-0 small rounded font-weight-bold" style="background-color: rgb(60, 60, 60); color: rgb(150, 150, 150);">Share this link:</label>
+            </div>
+            <input type="text" id="link-display" class="form-control w-100 font-italic text-truncate pt-1 pb-2 pl-2 pr-2 m-0" value="" readonly>
+            <button class="btn w-100 d-inline-block rounded-0 font-weight-normal" id="copy-link-button">Copy Link</button>
+
+            <div id="checkbox-div" class="checkbox pt-2 pl-2">
+                <label id="checkbox-label" class="unselectable" style="color:rgb(200, 200, 200); margin-left: 1px;"><input type="checkbox" id="checkbox" class="position-relative" style="top: 1px;" value="">&ensp;Only I have control</label>
+            </div>
+
         </div>
     </div>
 
@@ -128,7 +192,7 @@
                 <div class="embed-responsive embed-responsive-16by9" style="flex-shrink: 1; background-color: black;">
 
                     <div id="is-buffering-name-div" class="p-0 m-0 float-left position-absolute invisible w-100" style="pointer-events: none; top: calc(25% - 5px); z-index: 1;">
-                        <label id="is-buffering-name-label" class="text-center d-inline-block pl-1 pr-1 small rounded font-weight-bold" style="background-color: rgb(60, 60, 60); color: rgb(150, 150, 150);"></label>
+                        <label id="is-buffering-name-label" class="unselectable text-center d-inline-block pl-1 pr-1 small rounded font-weight-bold" style="background-color: rgb(60, 60, 60); color: rgb(150, 150, 150);"></label>
                     </div>
 
                     <div id="player"></div>
@@ -148,7 +212,7 @@
                 </div>
 
                 <div class="w-100" id="no-videos-div" style="flex-grow: 1;">
-                    <label id="no-videos" class="text-center d-inline-block pl-1 pr-1 mt-3 mb-3 small rounded font-weight-bold" style="background-color: rgb(45, 45, 45); color: rgb(90, 90, 90);">No videos in queue</label>
+                    <label id="no-videos" class="unselectable text-center d-inline-block pl-1 pr-1 mt-3 mb-3 small rounded font-weight-bold" style="background-color: rgb(45, 45, 45); color: rgb(90, 90, 90);">No videos in queue</label>
                 </div>
 
                 <button class="btn w-100 d-inline-block rounded-0 position-relative font-weight-normal invisible" id="next-video-button" style="left: 0px; bottom: 0px;">Play Next</button>
@@ -180,7 +244,19 @@
                 
                     <!-- <div class="p-2"> -->
 
-                        <div class="w-100 pt-1 pb-1" id="messages-div" style="height: calc(100% - 38px); overflow-x: hidden; overflow-y: auto;">
+                        <div>
+                            <button class="btn w-100 d-inline-block rounded-0 font-weight-normal float-left" id="share-button">Share</button>
+                            <!-- <button class="btn d-inline-block rounded-0 font-weight-normal float-left" id="share-button" style="width: calc(100% - 38px);">Share</button> -->
+                            <!-- <button class="btn d-inline-block rounded-0 font-weight-normal" id="help-button" style="width: 38px;">?</button> -->
+                        </div>
+                        
+                        
+
+
+
+                        
+
+                        <div class="w-100 pt-1 pb-1" id="messages-div" style="height: calc(100% - 38px - 38px); overflow-x: hidden; overflow-y: auto;">
                             <div id="messages"></div>
                         </div>
 
@@ -266,6 +342,8 @@
         let firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
         let player = null;
+
+        $('#link-display').val('https://video-chat-280220.wl.r.appspot.com/?id=' + ROOM_ID);
 
         function create_UUID() {
             let dt = new Date().getTime();
@@ -492,6 +570,45 @@
             if (e.keyCode == 13) {
                 handleSubmitLink();
             }
+        });
+
+        $("#share-button").click(function() {
+
+            // const isVisible = $('#share-cancel-div').hasClass('visible');
+            // if (isVisible) {
+            //     $('#share-cancel-div').removeClass('visible');
+            //     $('#share-cancel-div').addClass('invisible');
+            //     $('#share-div').removeClass('visible');
+            //     $('#share-div').addClass('invisible');
+            // } else {
+            //     $('#share-cancel-div').removeClass('invisible');
+            //     $('#share-cancel-div').addClass('visible');
+            //     $('#share-div').removeClass('invisible');
+            //     $('#share-div').addClass('visible');
+            // }
+
+            $('#share-cancel-div').removeClass('invisible');
+            $('#share-cancel-div').addClass('visible');
+            $('#share-div').removeClass('invisible');
+            $('#share-div').addClass('visible');
+        });
+
+        $("#share-cancel-div").click(function() {
+            $('#share-cancel-div').removeClass('visible');
+            $('#share-cancel-div').addClass('invisible');
+            $('#share-div').removeClass('visible');
+            $('#share-div').addClass('invisible');
+        });
+
+        $("#copy-link-button").click(function() {
+            var copyText = document.getElementById("link-display");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999)
+            document.execCommand("copy");
+        });
+
+        $("#help-button").click(function() {
+
         });
 
         $("#submit-link-button").click(function() {
@@ -755,7 +872,7 @@
 
                 $('#messages').append(`
                     <div id=${messageId} class="p-0 m-0 w-100 float-${floatSide}">
-                        <label class="${senderId} text-left d-inline-block bg-light text-dark float-${floatSide} rounded m-1 pl-1 pr-1 small" style="word-break: break-all;">${senderName}</label>
+                        <label class="unselectable ${senderId} text-left d-inline-block bg-light text-dark float-${floatSide} rounded m-1 pl-1 pr-1 small" style="word-break: break-all;">${senderName}</label>
                     </div>
                 `);
 
@@ -770,7 +887,7 @@
 
                     $('#messages').append(`
                         <div class="p-0 m-0 w-100">
-                            <label class="text-left d-inline-block bg-light text-dark rounded m-1 pl-1 pr-1 small font-weight-bold" style="word-break: break-all;">
+                            <label class="unselectable text-left d-inline-block bg-light text-dark rounded m-1 pl-1 pr-1 small font-weight-bold" style="word-break: break-all;">
 
                                 <label class="${senderId} d-inline-block h-100 p-0 m-0">${senderName}</label>
 
@@ -785,7 +902,7 @@
 
                     $('#messages').append(`
                         <div class="p-0 m-0 w-100">
-                            <label class="text-left d-inline-block bg-light text-dark rounded m-1 pl-1 pr-1 small font-weight-bold" style="word-break: break-all;">
+                            <label class="unselectable text-left d-inline-block bg-light text-dark rounded m-1 pl-1 pr-1 small font-weight-bold" style="word-break: break-all;">
 
                                 <label class="${senderId} d-inline-block h-100 p-0 m-0">${senderName}</label>
 
@@ -864,12 +981,12 @@
                     <div class="list-group-item p-0" style="background-color: rgb(35, 35, 35);">
 
                         <div class="float-left d-inline-block" style="width: 40px; height: 61px;">
-                            <label class="h-100 w-100 font-weight-bold" style="text-align: center; line-height: 61px; color: rgb(150, 150, 150);">${position}</label>
+                            <label class="unselectable h-100 w-100 font-weight-bold" style="text-align: center; line-height: 61px; color: rgb(150, 150, 150);">${position}</label>
                         </div>
 
                         <div class="float-right d-inline-block p-1 pr-0 pl-0" style="width: calc(100% - 40px)">
                             <label class="small text-left d-inline-block float-left w-100 m-1 font-italic text-truncate" style="color: rgb(200, 200, 200); max-width: calc(100% - 10px);">${videoLink}</label>
-                            <label class="${senderId} text-left d-inline-block float-left rounded m-1 pl-1 pr-1 small text-truncate" style="max-width: calc(100% - 10px); background-color: rgb(50, 50, 50); color: rgb(180, 180, 180);">${senderName}</label>
+                            <label class="${senderId} unselectable text-left d-inline-block float-left rounded m-1 pl-1 pr-1 small text-truncate" style="max-width: calc(100% - 10px); background-color: rgb(50, 50, 50); color: rgb(180, 180, 180);">${senderName}</label>
                         </div>
 
                     </div>
