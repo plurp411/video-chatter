@@ -13,6 +13,7 @@ var io = require('socket.io').listen(http, {
 
 var port = process.env.PORT || 3000;
 var ip = require('ip');
+const publicIp = require('public-ip');
 var url = require('url');
 const {machineId} = require('node-machine-id');
 app.engine('html', require('ejs').renderFile);
@@ -25,6 +26,10 @@ app.use(express.static(__dirname + '/public'));
 // app.use('/firstpage', firstpage);
 // app.use(express.static('routes');
 
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store')
+  next()
+})
 
 let ROOM_ID = '';
 
@@ -67,10 +72,21 @@ app.get('/', function(req, res, next){
     //   return res.end();
     // });
 
-    const ipAddress = ip.address();
-    const encryptedIp = encrypt(ipAddress);
-    res.writeHead(301, { "Location": httpText + req.headers['host'] + '/?id=' + encryptedIp });
-    return res.end();
+    // const ipAddress = ip.address();
+
+    (async () => {
+      const ipAddress = await publicIp.v4();
+      const encryptedIp = encrypt(ipAddress);
+      res.writeHead(301, { "Location": httpText + req.headers['host'] + '/?id=' + encryptedIp });
+      // res.writeHead(301, { "Location": httpText + req.headers['host'] + '/?id=' + create_UUID() });
+      return res.end();
+    })();
+
+    // const ipAddress = await publicIp.v4();
+    // const encryptedIp = encrypt(ipAddress);
+    // console.log(ipAddress);
+    // res.writeHead(301, { "Location": httpText + req.headers['host'] + '/?id=' + encryptedIp });
+    // return res.end();
 
   } else {
 
@@ -82,11 +98,22 @@ app.get('/', function(req, res, next){
     //   res.render(__dirname + '/index.html', passedData);
     // });
 
-    const ipAddress = ip.address();
-    const encryptedIp = encrypt(ipAddress);
-    passedData['machine_id'] = encryptedIp;
+    (async () => {
+      // const ipAddress = ip.address();
+      const ipAddress = await publicIp.v4();
+      const encryptedIp = encrypt(ipAddress);
+      passedData['machine_id'] = encryptedIp;
+      // passedData['machine_id'] = create_UUID();
+      res.render(__dirname + '/index2.html', passedData);
+    })();
+
+    // // const ipAddress = ip.address();
+    // const ipAddress = await publicIp.v4();
+    // const encryptedIp = encrypt(ipAddress);
+    // console.log(ipAddress);
+    // // passedData['machine_id'] = encryptedIp;
     // passedData['machine_id'] = create_UUID();
-    res.render(__dirname + '/index2.html', passedData);
+    // res.render(__dirname + '/index2.html', passedData);
   }
 });
 

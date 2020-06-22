@@ -4,6 +4,10 @@
     <title>Video Chat</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="-1">
+    <meta http-equiv="CACHE-CONTROL" content="NO-CACHE"> -->
     
     <!-- <link rel="icon" type="image/png" href="favicon.ico"> -->
     
@@ -14,1121 +18,144 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
 
-<!--     <link rel="stylesheet" type="text/css" href="/index.css">
-    <link rel="stylesheet" type="text/css" href="/splitjs.css"> -->
+    <link rel="stylesheet" href="/style.css">
     
-    <style>
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        /* * {
-            filter: invert(100%) !important;
-        } */
-
-        .btn {
-            background-color: rgb(52, 52, 52) !important;
-            color: rgb(220, 220, 220) !important;
-            /* font-weight: bold !important; */
-            border-top: 1px solid rgb(10, 10, 10) !important;
-            border-bottom: 1px solid rgb(10, 10, 10) !important;
-        }
-
-        .btn:hover {
-            opacity: 0.85;
-        }
-
-        .btn, .btn:focus, .btn:active {
-            outline: none !important;
-            box-shadow: none !important;
-        }
-
-        .form-control, .form-control:focus, .form-control:active, #link-display, #link-display:focus, #link-display:active {
-            -webkit-box-shadow: none !important;
-            box-shadow: none !important;
-            border: 0px !important;
-        }
-
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgb(138, 138, 138, 0.2); 
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: rgb(138, 138, 138, 0.2); 
-        }
-
-/*        #sender-name-input::placeholder {
-            color: black;
-            opacity: 0.8;
-        }*/
-
-        .form-control::placeholder {
-            color: white;
-            opacity: 0.7;
-        }
-
-        .form-control, #share-button, #link-display, #checkbox-div {
-            /* background-color: rgb(40, 40, 40) !important;
-            color: rgb(235, 235, 235) !important; */
-            background-color: rgb(40, 40, 40);
-            color: rgb(235, 235, 235);
-        }
-
-        #checkbox-label:hover, #checkbox:hover {
-            cursor: pointer;
-        }
-
-        #link-display {
-            color: rgb(245, 245, 245) !important;
-        }
-
-        #message-input, #help-button {
-            background-color: rgb(35, 35, 35) !important;
-            color: rgb(235, 235, 235) !important;
-        }
-
-        #share-button {
-            /* border-right: 1px solid rgb(10, 10, 10) !important; */
-        }
-
-        #share-button, #help-button {
-            border-top: 0px !important;
-        }
-
-        #message-input {
-            border-top: 1px solid rgb(10, 10, 10) !important;
-        }
-
-        #share-actual-div {
-            background-color: rgb(40, 40, 40);
-            border: 4px solid rgb(10, 10, 10);
-            color: rgb(235, 235, 235);
-        }
-
-        #left-side, #right-side {
-            float: left;
-        }
-
-/*        .gutter.logo-gutter {
-            background-color: #34495E;
-        }*/
-
-        .gutter {
-            float: left;
-            /* background-color: rgb(55, 55, 55); */
-            background-color: rgb(45, 45, 45);
-            cursor: ew-resize;
-        }
-
-        .unselectable {
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-    </style>
   </head>
 
+  <!-- server side info -->
   <label class="d-none" id="room-id-label"><%= id %></label>
   <label class="d-none" id="user-id-label"><%= machine_id %></label>
 
+  <!-- main -->
   <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(30, 30, 30);">
-  <!-- <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(60, 60, 60);"></body> -->
 
+    <!-- loading spinner -->
     <div id="loading-div" class="row align-items-center h-100 w-100" style="background-color: rgb(60, 60, 60); z-index: 1;">
         <div class="col-12 text-center">
             <div class="spinner-border text-light"></div>
         </div>
     </div>
 
+    <!-- share background -->
     <div id="share-cancel-div" class="w-100 h-100 position-absolute invisible" style="z-index: 1; opacity: 0.2; background-color: black;"></div>
 
+    <!-- share pop up -->
     <div id="share-div" class="w-100 position-absolute invisible" style="text-align: center; top: 20%; z-index: 1; pointer-events: none;">
-        <div id="share-actual-div" class="d-inline-block p-0 text-left" style="width: 350px; pointer-events: auto;">
+        <div id="share-actual-div" class="d-inline-block p-0 text-left rounded" style="width: 350px; pointer-events: auto;">
             
-            <!-- <label class="w-100 p-0 pt-2 pl-2 m-0" style="color:rgb(185, 185, 185);">Share this link:</label> -->
+            <!-- link instructions -->
             <div class="w-100 p-0 pt-2 pl-2 m-0 text-center">
                 <label class="unselectable text-center d-inline-block pl-1 pr-1 m-0 small rounded font-weight-bold" style="background-color: rgb(60, 60, 60); color: rgb(150, 150, 150);">Share this link:</label>
             </div>
+
+            <!-- video link -->
             <input type="text" id="link-display" class="form-control w-100 font-italic text-truncate pt-1 pb-2 pl-2 pr-2 m-0" value="" readonly>
             <button class="btn w-100 d-inline-block rounded-0 font-weight-normal" id="copy-link-button">Copy Link</button>
 
-            <div id="checkbox-div" class="checkbox pt-2 pl-2">
+            <!-- control checkbox -->
+            <div id="checkbox-div" class="checkbox pt-2 pl-2 rounded">
                 <label id="checkbox-label" class="unselectable" style="color:rgb(200, 200, 200); margin-left: 1px;"><input type="checkbox" id="checkbox" class="position-relative" style="top: 1px;" value="">&ensp;Only I have control</label>
             </div>
 
         </div>
     </div>
 
-<!--     <div class="d-block h-100" id="all-div">
- -->
-        <div id="left-side" style="height: 100vh; max-width: calc(100% - 204px); min-width: 200px;">
-            <div class="w-100 h-100 text-center" style="display: flex; flex-direction: column;">
+    <!-- left side -->
+    <div id="left-side" style="height: 100vh; max-width: calc(100% - 204px); min-width: 200px;">
+        <div class="w-100 h-100 text-center" style="display: flex; flex-direction: column;">
 
+            <!-- video player -->
+            <div class="embed-responsive embed-responsive-16by9" style="flex-shrink: 1; background-color: black;">
 
-
-<!--                <div class="" style="width: 600px; height: 337.5px; background-color: black;">
-
-                     <div id="player"></div>
-
-                    <iframe id="existing-iframe-example"
-                        width="100%" height="360"
-                        src="https://www.youtube.com/embed/M7lc1UVf-VE?enablejsapi=1"
-                        frameborder="0"
-                        style="border: solid 4px #37474F"
-                    ></iframe>
-
-                </div>
- -->
-
-
-
-                <div class="embed-responsive embed-responsive-16by9" style="flex-shrink: 1; background-color: black;">
-
-                    <div id="is-buffering-name-div" class="p-0 m-0 float-left position-absolute invisible w-100" style="pointer-events: none; top: calc(25% - 5px); z-index: 1;">
-                        <label id="is-buffering-name-label" class="unselectable text-center d-inline-block pl-1 pr-1 small rounded font-weight-bold" style="background-color: rgb(60, 60, 60); color: rgb(150, 150, 150);"></label>
-                    </div>
-
-                    <div id="player"></div>
+                <!-- video buffering -->
+                <div id="is-buffering-name-div" class="p-0 m-0 float-left position-absolute invisible w-100" style="pointer-events: none; top: calc(25% - 5px); z-index: 1;">
+                    <label id="is-buffering-name-label" class="unselectable text-center d-inline-block pl-1 pr-1 small rounded font-weight-bold" style="background-color: rgb(60, 60, 60); color: rgb(150, 150, 150);"></label>
                 </div>
 
-
-
-
-
-                <input type="text" class="form-control d-inline-block rounded-0 w-100" id="link-input" placeholder="Video Link" style="background-color: rgb(40, 40, 40); color: rgb(235, 235, 235);"/>
-                <button class="btn w-100 d-inline-block rounded-0 font-weight-normal" id="submit-link-button" style="">Add Video</button>
-
-                <div class="w-100 d-none" id="videos-div" style="flex-grow: 1; overflow-x: hidden; overflow-y: auto;">
-                    <div style="height: 0px;">
-                        <ul class="list-group list-group-flush" id="videos"></ul>
-                    </div>
-                </div>
-
-                <div class="w-100" id="no-videos-div" style="flex-grow: 1;">
-                    <label id="no-videos" class="unselectable text-center d-inline-block pl-1 pr-1 mt-3 mb-3 small rounded font-weight-bold" style="background-color: rgb(45, 45, 45); color: rgb(90, 90, 90);">No videos in queue</label>
-                </div>
-
-                <button class="btn w-100 d-inline-block rounded-0 position-relative font-weight-normal invisible" id="next-video-button" style="left: 0px; bottom: 0px;">Play Next</button>
-                <input type="text" class="form-control w-100 d-block rounded-0 position-relative invisible" id="sender-name-input" placeholder="Display Name" style="bottom: 0px;"/>
-            
+                <!-- actual player -->
+                <div id="player"></div>
             </div>
-        </div>
 
-        <div id="right-side" style="height: 100vh; max-width: calc(100% - 204px); min-width: 200px;">
-  
-            <!-- <div class="w-100 text-center">
-                <input type="text" class="form-control d-inline-block" id="link-input" placeholder="Video Url" style="max-width: 600px;"/>
-            </div>
-            <div class="w-100 text-center">
-                <button class="btn btn-secondary mt-2 w-100 d-inline-block" id="submit-link-button" style="max-width: 600px;">Submit</button>
-            </div> -->
+            <!-- video link -->
+            <input type="text" class="form-control d-inline-block rounded-0 w-100" id="link-input" placeholder="Video Link" style="background-color: rgb(40, 40, 40); color: rgb(235, 235, 235);"/>
+            <button class="btn w-100 d-inline-block rounded-0 font-weight-normal" id="submit-link-button">Add Video</button>
 
-            <!-- <div>
-                <ul id="messages"></ul>
-                <form action="">
-                    <input id="m" autocomplete="off" /><button>Send</button>
-                </form>
-            </div> -->
-            
-            <div class="w-100 text-center">
-                <div class="w-100" style="height: 100vh; background-color: rgb(25, 25, 25);">
-
-                    <!-- 467px -->
-                
-                    <!-- <div class="p-2"> -->
-
-                        <div>
-                            <button class="btn w-100 d-inline-block rounded-0 font-weight-normal float-left" id="share-button">Share</button>
-                            <!-- <button class="btn d-inline-block rounded-0 font-weight-normal float-left" id="share-button" style="width: calc(100% - 38px);">Share</button> -->
-                            <!-- <button class="btn d-inline-block rounded-0 font-weight-normal" id="help-button" style="width: 38px;">?</button> -->
-                        </div>
-                        
-                        
-
-
-
-                        
-
-                        <div class="w-100 pt-1 pb-1" id="messages-div" style="height: calc(100% - 38px - 38px); overflow-x: hidden; overflow-y: auto;">
-                            <div id="messages"></div>
-                        </div>
-
-                        <!-- <div id="is-typing-name-div" class="p-0 m-0 w-100 float-left">
-                            <label id="is-typing-name-label" class="text-left d-inline-block bg-light text-dark float-left rounded m-1 pl-1 pr-1 small" style="word-break: break-all;">bla blah is typing</label>
-                        </div> -->
-                        <div id="is-typing-name-div" class="p-0 m-0 w-100 float-left position-absolute invisible" style="bottom: 38px; height: 20px;">
-                            <label id="is-typing-name-label" class="text-left d-block float-left pl-2 pr-2 small w-100 h-100" style="word-break: break-all; line-height: 20px; background-color: rgb(40, 40, 40); color: rgb(235, 235, 235);"></label>
-                        </div>
-                        
-                        <div class="position-relative" style="bottom: 0px; height: 38px; width: 100%;">
-                            <!-- <form action="">
-                                <input type="text" class="form-control d-inline-block float-left rounded-0" id="message-input" placeholder="Message" autocomplete="off" style="width: 70%;"/>
-                                <button class="btn d-inline-block float-right rounded-0" style="width: 30%; background-color: rgb(190, 190, 190); color: black">Send</button>
-                            </form> -->
-                            <form action="">
-                                <input type="text" class="form-control d-inline-block float-left rounded-0 w-100 invisible" id="message-input" placeholder="Message" autocomplete="off"/>
-                            </form>
-                        </div>
-                    <!-- </div> -->
-
+            <!-- video queue -->
+            <div class="w-100 d-none" id="videos-div" style="flex-grow: 1; overflow-x: hidden; overflow-y: auto;">
+                <div style="height: 0px;">
+                    <ul class="list-group list-group-flush" id="videos"></ul>
                 </div>
             </div>
 
-            <!-- <div class="w-100 position-absolute bg-info" style="bottom: 0px; height: 100px">
-                <form action="" class="w-100">
-                    <input type="text" class="form-control w-100" id="m" placeholder="Message" autocomplete="off"/>
-                    <button>Send</button>
-                </form>
-            </div> -->
+            <!-- empty video queue -->
+            <div class="w-100" id="no-videos-div" style="flex-grow: 1;">
+                <label id="no-videos" class="unselectable text-center d-inline-block pl-1 pr-1 mt-3 mb-3 small rounded font-weight-bold">No videos in queue</label>
+            </div>
+
+            <!-- next video & display name -->
+            <button class="btn w-100 d-inline-block rounded-0 position-relative font-weight-normal invisible" id="next-video-button" style="left: 0px; bottom: 0px;">Play Next</button>
+            <input type="text" class="form-control w-100 d-block rounded-0 position-relative invisible" id="sender-name-input" placeholder="Display Name" style="bottom: 0px;"/>
 
         </div>
-<!--     </div>
- -->    
-    <script async defer type="text/javascript" src="/web-font.js"></script>
-    <script type="text/javascript" src="/split.min.js"></script>
-    <script>
-
-        Split(['#left-side', '#right-side'], {
-            gutter: function (index, direction) {
-                var gutter = document.createElement('div')
-                gutter.className = 'gutter gutter-' + direction
-                gutter.style.height = '100vh'
-                return gutter
-            },
-            gutterSize: 4,
-        })
-
-    </script>
-
-    <script>
-
-        const ROOM_ID = $('#room-id-label').html();
-        const CURRENT_USER = $('#user-id-label').html();
-        // const CURRENT_USER = create_UUID();
-
-        let CURRENT_NAME = '';
-        let VIDEO_ID = '';
-
-        let GOT_INFO = null;
-        let GOT_VIDEO_ID = null;
-        let GOT_CURRENT_TIME = null;
-        let GOT_IS_PAUSED = null;
-
-        let CURRENT_STATE = null;
-
-        let IS_API_READY = false;
-        let IS_PLAYER_READY = false;
-
-        let IS_BUFFERING = false;
-
-        let LAST_MESSAGE_INFO = {};
-
-        let VIDEO_URL_QUEUE = {};
-        
-        // let socket = io('/' + ROOM_ID);
-        let socket = io();
-
-        // load the IFrame Player API code asynchronously
-
-        let tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        let firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-        let player = null;
-
-        $('#link-display').val('https://video-chat-280220.wl.r.appspot.com/?id=' + ROOM_ID);
-
-        function create_UUID() {
-            let dt = new Date().getTime();
-            let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                let r = (dt + Math.random()*16)%16 | 0;
-                dt = Math.floor(dt/16);
-                return (c=='x' ? r :(r&0x3|0x8)).toString(16);
-            });
-            return uuid;
-        }
-
-        function isEmpty(obj) {
-            return Object.keys(obj).length === 0;
-        }
-
-        function updateVideoPlayer(info) {
-
-            const fromUser = info.from_user;
-            const videoId = info.video_id;
-            const currentTime = info.current_time;
-            const isPaused = info.is_paused;
-
-            if (fromUser != CURRENT_USER) {
-
-                GOT_VIDEO_ID = videoId;
-                GOT_CURRENT_TIME = currentTime;
-                GOT_IS_PAUSED = isPaused;
-
-                if (videoId != VIDEO_ID) {
-
-                    VIDEO_ID = videoId;
-
-                    if (player === null) {
-
-                        player = new YT.Player('player', {
-                            videoId: videoId,
-                            playerVars: { 'autoplay': 1 },
-                            events: {
-                                'onReady': onPlayerReady,
-                                'onStateChange': onPlayerStateChange
-                            }
-                        });
-
-                    } else {
-                        player.loadVideoById(videoId);
-                    }
-
-                } else if (IS_PLAYER_READY) {
-
-                    player.seekTo(currentTime);
-
-                    if (isPaused) {
-                        player.pauseVideo();
-                    } else {
-                        player.playVideo();
-                    }
-
-                } else {
-                    // GOT_CURRENT_TIME = currentTime;
-                    // GOT_IS_PAUSED = isPaused;
-                }
-            }
-        }
-
-        let delay = (function() {
-            let timer = 0;
-            return function(callback, ms) {
-                clearTimeout (timer);
-                timer = setTimeout(callback, ms);
-            };
-        })();
-
-        function onYouTubeIframeAPIReady() {
-
-            $("#loading-div").remove();
-
-            $("#next-video-button").removeClass('invisible');
-            $("#sender-name-input").removeClass('invisible');
-            $("#message-input").removeClass('invisible');
-
-            IS_API_READY = true;
-            
-            if (GOT_INFO !== null) {
-                updateVideoPlayer(GOT_INFO);
-            }
-        }
-
-        function onPlayerReady(event) {
-
-            IS_PLAYER_READY = true;
-
-            player.seekTo(GOT_CURRENT_TIME);
-
-            if (GOT_IS_PAUSED) {
-                player.pauseVideo();
-            } else {
-                player.playVideo();
-            }
-        }
-
-        // function updateGotVariables(gotInfo) {
-        //     GOT_INFO = gotInfo;
-        //     GOT_VIDEO_ID = gotInfo.video_id;
-        //     GOT_CURRENT_TIME = gotInfo.current_time;
-        //     GOT_IS_PAUSED = gotInfo.is_paused;
-        // }
-
-        function onPlayerStateChange(event) {
-
-            CURRENT_STATE = event.data;
-
-            let isPaused = true;
-            if (event.data == YT.PlayerState.PLAYING) {
-                isPaused = false;
-            }
-
-            // messageLog(event.data);
-
-            const currentTime = getVideoTime();
-            // if (GOT_VIDEO_ID !== null && GOT_IS_PAUSED !== null && GOT_CURRENT_TIME !== null) {
-            if (VIDEO_ID != GOT_VIDEO_ID || isPaused != GOT_IS_PAUSED || (Math.abs(currentTime - GOT_CURRENT_TIME) > 1)) {
-                if (event.data != YT.PlayerState.BUFFERING && event.data != -1) {
-                    emitVideoInfo(CURRENT_USER, VIDEO_ID, currentTime, isPaused);
-                }
-            }
-            // }
-
-            if (event.data == YT.PlayerState.BUFFERING) {
-
-                IS_BUFFERING = true;
-                emitIsBufferingInfo(true);
-                
-            } else if (IS_BUFFERING) {
-
-                IS_BUFFERING = false;
-                emitIsBufferingInfo(false);
-            }
-        }
-        
-        function stopVideo() {
-            player.stopVideo();
-        }
-
-        function getVideoTime() {
-            return player.getCurrentTime();
-        }
-
-        function emitVideoInfo(fromUser, videoId, currentTime, isPaused) {
-            const videoInfo = {
-                from_user: fromUser,
-                video_id: videoId,
-                current_time: currentTime,
-                is_paused: isPaused
-            };
-            // updateGotVariables(videoInfo);
-            socket.emit('video_info', videoInfo);
-        }
-
-        function emitIsTypingInfo(isTyping) {
-            const isTypingInfo = {
-                is_typing_name: CURRENT_NAME,
-                is_typing: isTyping
-            };
-            socket.emit('is_typing_info', isTypingInfo);
-        }
-
-        function emitIsBufferingInfo(isBuffering) {
-            const isBufferingInfo = {
-                is_buffering_name: CURRENT_NAME,
-                is_buffering: isBuffering
-            };
-            socket.emit('is_buffering_info', isBufferingInfo);
-        }
-
-        function emitSenderNameChangeInfo(currentSenderName) {
-            const senderNameChangeInfo = {
-                sender_name_change_user: CURRENT_USER,
-                sender_name_change_name: currentSenderName
-            };
-            updateSenderName(senderNameChangeInfo);
-            socket.emit('sender_name_change_info', senderNameChangeInfo);
-        }
-        
-        function emitVideoUrlQueue(videoUrlQueue) {
-            updateVideoQueue(videoUrlQueue);
-            socket.emit('video_url_queue', videoUrlQueue);
-        }
-
-        function handleSubmitLink() {
-
-            if (CURRENT_NAME == '') {
-                $('#sender-name-input').css('background-color', '#291a1a');
-                return;
-            }
-
-            const videoLink = $("#link-input").val().trim();
-            const videoId = getVideoIdFromLink(videoLink);
-
-            if (!videoId || videoId == VIDEO_ID || videoLink in VIDEO_URL_QUEUE) {
-                return;
-            }
-
-            VIDEO_URL_QUEUE[videoLink] = {
-                sender_name: CURRENT_NAME,
-                sender_id: CURRENT_USER
-            };
-            emitVideoUrlQueue(VIDEO_URL_QUEUE);
-
-            $("#link-input").val('');
-
-            const messageInfo = {
-                message: " added a video",
-                sender_id: CURRENT_USER,
-                sender_name: CURRENT_NAME,
-                message_id: create_UUID(),
-                message_type: 'server_add_video'
-            };
-
-            addMessage(messageInfo);
-            socket.emit('message_info', messageInfo);
-        }
-
-        $('#link-input').bind('keypress', function(e) {
-            if (e.keyCode == 13) {
-                handleSubmitLink();
-            }
-        });
-
-        $("#share-button").click(function() {
-
-            // const isVisible = $('#share-cancel-div').hasClass('visible');
-            // if (isVisible) {
-            //     $('#share-cancel-div').removeClass('visible');
-            //     $('#share-cancel-div').addClass('invisible');
-            //     $('#share-div').removeClass('visible');
-            //     $('#share-div').addClass('invisible');
-            // } else {
-            //     $('#share-cancel-div').removeClass('invisible');
-            //     $('#share-cancel-div').addClass('visible');
-            //     $('#share-div').removeClass('invisible');
-            //     $('#share-div').addClass('visible');
-            // }
-
-            $('#share-cancel-div').removeClass('invisible');
-            $('#share-cancel-div').addClass('visible');
-            $('#share-div').removeClass('invisible');
-            $('#share-div').addClass('visible');
-        });
-
-        $("#share-cancel-div").click(function() {
-            $('#share-cancel-div').removeClass('visible');
-            $('#share-cancel-div').addClass('invisible');
-            $('#share-div').removeClass('visible');
-            $('#share-div').addClass('invisible');
-        });
-
-        $("#copy-link-button").click(function() {
-            var copyText = document.getElementById("link-display");
-            copyText.select();
-            copyText.setSelectionRange(0, 99999)
-            document.execCommand("copy");
-        });
-
-        $("#help-button").click(function() {
-
-        });
-
-        $("#submit-link-button").click(function() {
-            handleSubmitLink();
-        });
-
-        $("#next-video-button").click(function() {
-
-            if (CURRENT_NAME == '') {
-                $('#sender-name-input').css('background-color', '#291a1a');
-                return;
-            }
-
-            if (isEmpty(VIDEO_URL_QUEUE)) {
-                return;
-            }
-
-            const videoLink = Object.keys(VIDEO_URL_QUEUE)[0];
-            const videoLinkSenderName = VIDEO_URL_QUEUE[videoLink]['sender_name'];
-            const videoLinkSenderId = VIDEO_URL_QUEUE[videoLink]['sender_id'];
-            handleStartVideo(videoLink, videoLinkSenderName, videoLinkSenderId);
-            
-            delete VIDEO_URL_QUEUE[videoLink];
-            emitVideoUrlQueue(VIDEO_URL_QUEUE);
-        })
-
-        $('#sender-name-input').on('focus', function() {
-            $('#sender-name-input').css('background-color', 'rgb(40, 40, 40)');
-            $('#sender-name-input').css('color', 'rgb(235, 235, 235)');
-        });
-
-        function handleNewSenderName() {
-            const currentSenderName = getCurrentSenderName();
-            if (currentSenderName != '' && currentSenderName != CURRENT_NAME) {
-                emitSenderNameChangeInfo(currentSenderName);
-            }
-            CURRENT_NAME = currentSenderName;
-            $('#sender-name-input').val(getCurrentSenderName());
-        }
-
-        $('#sender-name-input').on('focusout', function() {
-            handleNewSenderName();
-        });
-
-        $('#sender-name-input').bind('keypress', function(e) {
-            if (e.keyCode == 13) {
-                handleNewSenderName();
-            }
-        });
-
-        $('#sender-name-input').on('input', function() {
-            const currentSenderName = $('#sender-name-input').val();
-            let newSenderName = emojiParse(currentSenderName);            
-            newSenderName = newSenderName.substring(0, 50);
-            $('#sender-name-input').val(newSenderName);
-        });
-
-        $('#message-input').on('input', function() {
-
-            const currentMessageText = $('#message-input').val();
-            const newMessageText = emojiParse(currentMessageText);
-            $('#message-input').val(newMessageText);
-
-            if (CURRENT_NAME == '') {
-                return;
-            }
-            
-            emitIsTypingInfo(true);
-        });
-
-        $('#message-input').on('keyup', function() {
-
-            if (CURRENT_NAME == '') {
-                return;
-            }
-
-            delay(function() {
-                emitIsTypingInfo(false);
-            }, 1000);
-        });
-
-        function messageLog(messageText) {
-            $('#messages').append(`
-                <div class="p-0 m-0 w-100 float-left">
-                    <label class="text-left d-inline-block bg-white text-dark float-left rounded m-1 pl-1 pr-1" style="word-break: break-all;">${messageText}</label>
+    </div>
+
+    <!-- right side -->
+    <div id="right-side" style="height: 100vh; max-width: calc(100% - 204px); min-width: 200px;">
+        <div class="w-100 text-center">
+            <div class="w-100" style="height: 100vh; background-color: rgb(25, 25, 25);">
+
+                <!-- share & help button -->
+                <div>
+                    <button class="btn w-100 d-inline-block rounded-0 font-weight-normal float-left" id="share-button">Share</button>
+                    <!-- <button class="btn d-inline-block rounded-0 font-weight-normal float-left" id="share-button" style="width: calc(100% - 38px);">Share</button> -->
+                    <!-- <button class="btn d-inline-block rounded-0 font-weight-normal" id="help-button" style="width: 38px;">?</button> -->
                 </div>
-            `);
-            scrollToBottom();
-        }
 
-        function scrollToBottom() {
-            const messagesDiv = document.getElementById("messages-div");
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }
+                <!-- all messages -->
+                <div class="w-100 pt-1 pb-1" id="messages-div" style="height: calc(100% - 38px - 38px); overflow-x: hidden; overflow-y: auto;">
+                    <div id="messages"></div>
+                </div>
 
-        function scrollToBottomVideoUrlQueue() {
-            const videoUrlQueue = document.getElementById("videos-div");
-            videoUrlQueue.scrollTop = videoUrlQueue.scrollHeight;
-        }
-
-        function getCurrentSenderName() {
-            return $("#sender-name-input").val().trim();
-        }
-
-        function handleStartVideo(videoLink, videoLinkSenderName, videoLinkSenderId) {
-
-            const videoId = getVideoIdFromLink(videoLink);
-
-            if (videoId != VIDEO_ID) {
-
-                VIDEO_ID = videoId;
-
-                if (player === null) {
-
-                    player = new YT.Player('player', {
-                        videoId: videoId,
-                        playerVars: { 'autoplay': 1 },
-                        events: {
-                            'onReady': onPlayerReady,
-                            'onStateChange': onPlayerStateChange
-                        }
-                    });
-
-                } else {
-                    player.loadVideoById(videoId);
-                }
-
-                if (IS_PLAYER_READY) {
-                    player.playVideo();
-                } else {
-                    GOT_CURRENT_TIME = 0;
-                    GOT_IS_PAUSED = false;
-                }
-
-                emitVideoInfo(CURRENT_USER, VIDEO_ID, 0, false);
-
-                const messageInfo = {
-                    message: " started ",
-                    sender_id: CURRENT_USER,
-                    sender_name: CURRENT_NAME,
-                    message_id: create_UUID(),
-                    message_type: 'server_start_video',
-                    video_sender_id: videoLinkSenderId,
-                    video_sender_name: videoLinkSenderName,
-                };
-
-                addMessage(messageInfo);
-                socket.emit('message_info', messageInfo);
-            }
-        }
-
-        function getVideoIdFromLink(videoLink) {
-            let videoId = videoLink.split('v=')[1];
-            let ampersandPosition = videoId.indexOf('&');
-            if (ampersandPosition != -1) {
-                videoId = videoId.substring(0, ampersandPosition);
-            }
-            return videoId;
-        }
-
-        function emojiParse(text) {
-            // faces
-            // wink tongue
-            text = text.replace(/\;p/g, "😜");
-            text = text.replace(/\;P/g, "😜");
-            // wink
-            text = text.replace(/\;\)/g, "😉");
-            // big smile
-            text = text.replace(/\:\>/g, "😊");
-            // smile
-            text = text.replace(/\:\)/g, "🙂");
-            // sad
-            text = text.replace(/\:\(/g, "🙁 ");
-            // tongue
-            text = text.replace(/\:p/g, "😛");
-            text = text.replace(/\:P/g, "😛");
-            // kiss
-            text = text.replace(/\:\*/g, "😘");
-            // neutral
-            text = text.replace(/\:\|/g, "😑");
-            // open grin
-            text = text.replace(/\:D/g, "😀");
-            // upside down smile
-            text = text.replace(/\(\:/g, "🙃");
-            // open mouth
-            text = text.replace(/\:o/g, "😮");
-            // scared
-            text = text.replace(/\:O/g, "😱");
-            // super angry
-            text = text.replace(/\>\>\>\:/g, "😤");
-            // very angry
-            text = text.replace(/\>\>\:/g, "😡");
-            // angry
-            text = text.replace(/\>\:/g, "😠");
-            // thinking
-            // text = text.replace(/\:\//g, "🤔");
-            text = text.replace(/\:\\/g, "🤔");
-            // more crying
-            text = text.replace(/\:\'\'\(/g, "😭");
-            text = text.replace(/\:\"\(/g, "😭");
-            // crying
-            text = text.replace(/\:\'\(/g, "😢");
-            // sleeping
-            text = text.replace(/z\:o/g, "😴");
-            text = text.replace(/z\:O/g, "😴");
-            // zzzs
-            text = text.replace(/zzz/g, "💤");
-            // laughing
-            text = text.replace(/xD/g, "😂");
-            text = text.replace(/XD/g, "😂");
-            // teethy grin
-            text = text.replace(/\:\#/g, "😬");
-            // disappointed
-            text = text.replace(/D\:/g, "😦");
-            // zipper mouth
-            text = text.replace(/\:\$/g, "🤐");
-            // hush
-            text = text.replace(/\:\%/g, "🤫");
-
-            // other
-            // dot heart
-            text = text.replace(/\.\<3/g, "❣");
-            // double hearts
-            text = text.replace(/\<\<3/g, "💕");
-            // shiny heart
-            text = text.replace(/\*\<3/g, "💖");
-            // spinning hearts
-            text = text.replace(/\<\-\<3/g, "💞");
-            // heart
-            text = text.replace(/\<3/g, "❤");
-            return text;
-        }
-
-        function addMessage(messageInfo) {
-            
-            const message = messageInfo.message;
-            const senderId = messageInfo.sender_id;
-            const senderName = messageInfo.sender_name;
-            const messageId = messageInfo.message_id;
-            const messageType = messageInfo.message_type;
-
-            if (!messageType.includes('server')) {
-
-                let floatSide = 'left';
-                let backgroundColor = 'secondary';
-
-                if (senderId == CURRENT_USER) {
-                    floatSide = 'right';
-                    backgroundColor = 'primary';
-                }
-
-                // message text
-
-                $('#messages').append(`
-                    <div class="p-0 m-0 w-100 float-${floatSide}">
-                        <label class="text-left d-inline-block bg-${backgroundColor} text-light float-${floatSide} rounded m-1 pl-1 pr-1" style="word-break: break-all;">${message}</label>
-                    </div>
-                `);
-
-                // sender name
-
-                $('#messages').append(`
-                    <div id=${messageId} class="p-0 m-0 w-100 float-${floatSide}">
-                        <label class="unselectable ${senderId} text-left d-inline-block bg-light text-dark float-${floatSide} rounded m-1 pl-1 pr-1 small" style="word-break: break-all;">${senderName}</label>
-                    </div>
-                `);
-
-            } else {
-
-                // server message
-
-                if (messageType == 'server_start_video') {
-
-                    const messageVideoSenderId = messageInfo.video_sender_id;
-                    const messageVideoSenderName = messageInfo.video_sender_name;
-
-                    $('#messages').append(`
-                        <div class="p-0 m-0 w-100">
-                            <label class="unselectable text-left d-inline-block bg-light text-dark rounded m-1 pl-1 pr-1 small font-weight-bold" style="word-break: break-all;">
-
-                                <label class="${senderId} d-inline-block h-100 p-0 m-0">${senderName}</label>
-
-                                ${message}
-
-                                <label class="${messageVideoSenderId} d-inline-block h-100 p-0 m-0">${messageVideoSenderName}</label>'s video
-                            </label>
-                        </div>
-                    `);
-                    
-                } else {
-
-                    $('#messages').append(`
-                        <div class="p-0 m-0 w-100">
-                            <label class="unselectable text-left d-inline-block bg-light text-dark rounded m-1 pl-1 pr-1 small font-weight-bold" style="word-break: break-all;">
-
-                                <label class="${senderId} d-inline-block h-100 p-0 m-0">${senderName}</label>
-
-                                ${message}
-
-                            </label>
-                        </div>
-                    `);
-                }
+                <!-- is typing -->
+                <div id="is-typing-name-div" class="p-0 m-0 w-100 float-left position-absolute invisible" style="bottom: 38px; height: 25px; line-height: 25px;">
+                    <label id="is-typing-name-label" class="text-left d-inline-block float-left pl-2 pr-2 small w-100 h-100 m-0" style="word-break: break-all; background-color: rgb(40, 40, 40); color: rgb(190, 190, 190);"></label>
+                </div>
                 
-                if (messageType == 'server_user_connect') {
+                <!-- message input -->
+                <div class="position-relative" style="bottom: 0px; height: 38px; width: 100%;">
+                    <input type="text" class="form-control d-inline-block float-left rounded-0 w-100 invisible" id="message-input" placeholder="Message" autocomplete="off"/>
+                </div>
 
-                    if (VIDEO_ID != '') {
-                        
-                        // player.pauseVideo();
+            </div>
+        </div>
+    </div>
+    
+    <link href="/main.html" rel="import"/>
 
-                        let isPaused = true;
-                        if (CURRENT_STATE == YT.PlayerState.PLAYING) {
-                            isPaused = false;
-                        }
+    <script async defer type="text/javascript" src="/split/web-font.js"></script>
+    <script type="text/javascript" src="/split/split.min.js"></script>
 
-                        const currentTime = getVideoTime();
-                        // if (CURRENT_STATE != YT.PlayerState.BUFFERING) {
-                            emitVideoInfo(CURRENT_USER, VIDEO_ID, currentTime, isPaused);
-                        // }
-                    }
-                    
-                    if (!isEmpty(VIDEO_URL_QUEUE)) {
-                        emitVideoUrlQueue(VIDEO_URL_QUEUE);
-                    }
-                }
-            }
+    <script type="text/javascript" src="/global-vars.js"></script>
+    <script type="text/javascript" src="/split/setup-split.js"></script>
+    <script type="text/javascript" src="/player/setup-player.js"></script>
 
-            if (messageType == 'user' && senderId == LAST_MESSAGE_INFO.sender_id) {
-                let senderDiv = document.getElementById(LAST_MESSAGE_INFO.message_id);
-                if (senderDiv !== null) {
-                    senderDiv.remove();
-                }
-            }
+    <script type="text/javascript" src="/functions/helper-funcs.js"></script>
+    <script type="text/javascript" src="/functions/message-funcs.js"></script>
+    <script type="text/javascript" src="/functions/sender-name-funcs.js"></script>
+    <script type="text/javascript" src="/functions/player-funcs.js"></script>
+    <script type="text/javascript" src="/functions/video-queue-funcs.js"></script>
+    <script type="text/javascript" src="/functions/share-funcs.js"></script>
+    <script type="text/javascript" src="/functions/buffering-funcs.js"></script>
+    <script type="text/javascript" src="/functions/typing-funcs.js"></script>
 
-            scrollToBottom();
+    <script type="text/javascript" src="/player/player-handlers.js"></script>
+    <script type="text/javascript" src="/sockets/socket-emits.js"></script>
 
-            LAST_MESSAGE_INFO = messageInfo;
-        }
+    <script type="text/javascript" src="/jquery/button-handling.js"></script>
+    <script type="text/javascript" src="/jquery/input-handling.js"></script>
+    <script type="text/javascript" src="/jquery/div-handling.js"></script>
 
-        function updateSenderName(senderNameChangeInfo) {
-
-            const senderNameChangeUser = senderNameChangeInfo.sender_name_change_user;
-            const senderNameChangeName = senderNameChangeInfo.sender_name_change_name;
-
-            $('.' + senderNameChangeUser).html(senderNameChangeName);
-
-            for (const [key, value] of Object.entries(VIDEO_URL_QUEUE)) {
-                const senderId = value.sender_id;
-                if (senderId == senderNameChangeUser) {
-                    const videoLink = key;
-                    VIDEO_URL_QUEUE[videoLink].sender_name = senderNameChangeName;
-                }
-            }
-        }
-
-        function updateVideoQueue(newVideoUrlQueue) {
-
-            VIDEO_URL_QUEUE = newVideoUrlQueue;
-
-            $('#videos').html('');
-
-            let lastVideoUrlSenderName = '';
-            let position = 0;
-            for (const [key, value] of Object.entries(newVideoUrlQueue)) {
-                position++;
-                const videoLink = key;
-                const senderName = value.sender_name;
-                const senderId = value.sender_id;
-                $('#videos').append(`
-                    <div class="list-group-item p-0" style="background-color: rgb(35, 35, 35);">
-
-                        <div class="float-left d-inline-block" style="width: 40px; height: 61px;">
-                            <label class="unselectable h-100 w-100 font-weight-bold" style="text-align: center; line-height: 61px; color: rgb(150, 150, 150);">${position}</label>
-                        </div>
-
-                        <div class="float-right d-inline-block p-1 pr-0 pl-0" style="width: calc(100% - 40px)">
-                            <label class="small text-left d-inline-block float-left w-100 m-1 font-italic text-truncate" style="color: rgb(200, 200, 200); max-width: calc(100% - 10px);">${videoLink}</label>
-                            <label class="${senderId} unselectable text-left d-inline-block float-left rounded m-1 pl-1 pr-1 small text-truncate" style="max-width: calc(100% - 10px); background-color: rgb(50, 50, 50); color: rgb(180, 180, 180);">${senderName}</label>
-                        </div>
-
-                    </div>
-                `);
-                lastVideoUrlSenderName = senderName;
-            }
-
-            $('#videos-div').removeClass('d-block');
-            $('#videos-div').removeClass('d-none');
-            $('#no-videos-div').removeClass('d-block');
-            $('#no-videos-div').removeClass('d-none');
-
-            if (isEmpty(newVideoUrlQueue)) {
-                $('#videos-div').addClass('d-none');
-                $('#no-videos-div').addClass('d-block');
-            } else {
-                $('#videos-div').addClass('d-block');
-                $('#no-videos-div').addClass('d-none');
-            }
-
-            // if (lastVideoUrlSenderName == CURRENT_NAME {
-            scrollToBottomVideoUrlQueue();
-            // }
-        }
-
-        $(function () {
-
-            $('form').submit(function(e) {
-
-                e.preventDefault(); // prevents page reloading
-
-                const messageText = $('#message-input').val().trim();
-                if (messageText != '' && CURRENT_NAME != '') {
-
-                    const messageInfo = {
-                        message: messageText,
-                        sender_id: CURRENT_USER,
-                        sender_name: CURRENT_NAME,
-                        message_id: create_UUID(),
-                        message_type: 'user'
-                    };
-
-                    addMessage(messageInfo);
-                    socket.emit('message_info', messageInfo);
-
-                    emitIsTypingInfo(false);
-
-                    $('#message-input').val('');
-                }
-                
-                if (messageText == '') {
-                    $('#message-input').val('');
-                }
-
-                if (CURRENT_NAME == '') {
-                    $('#sender-name-input').css('background-color', '#291a1a');
-                }
-                
-                return false;
-            });
-
-            socket.on('video_url_queue', function(videoUrlQueue) {
-                updateVideoQueue(videoUrlQueue);
-            });
-
-            socket.on('is_typing_info', function(isTypingInfo) {
-
-                const isTyping = isTypingInfo.is_typing;
-                const isTypingName = isTypingInfo.is_typing_name;
-
-                $('#is-typing-name-div').removeClass('visible');
-                $('#is-typing-name-div').addClass('invisible');
-
-                // $('#messages-div').css('height', 'calc(100% - 38px)');
-                
-                if (isTypingName == 'server_clear_is_typing') {
-                    return;
-                }
-                
-                if (isTyping) {
-
-                    $('#is-typing-name-label').text(isTypingName + " is typing...");
-
-                    $('#is-typing-name-div').removeClass('invisible');
-                    $('#is-typing-name-div').addClass('visible');
-
-                    // $('#messages-div').css('height', 'calc(100% - 38px - 20px)');
-                    // scrollToBottom();
-                }
-            });
-
-            socket.on('is_buffering_info', function(isBufferingInfo) {
-                
-                const isBuffering = isBufferingInfo.is_buffering;
-                const isBufferingName = isBufferingInfo.is_buffering_name;
-
-                $('#is-buffering-name-div').removeClass('visible');
-                $('#is-buffering-name-div').addClass('invisible');
-
-                if (isBufferingName == 'server_clear_is_buffering') {
-                    return;
-                }
-                
-                if (isBuffering) {
-
-                    if (isBufferingName == '') {
-                        $('#is-buffering-name-label').text("A user is buffering...");
-                    } else {
-                        $('#is-buffering-name-label').text(isBufferingName + " is buffering...");
-                    }
-
-                    $('#is-buffering-name-div').removeClass('invisible');
-                    $('#is-buffering-name-div').addClass('visible');
-                }
-            });
-
-            socket.on('sender_name_change_info', function(senderNameChangeInfo) {
-                updateSenderName(senderNameChangeInfo);
-            });
-
-            socket.on('message_info', function(messageInfo) {
-                addMessage(messageInfo);
-            });
-
-            socket.on('video_info', function(info) {
-
-                GOT_INFO = info;
-                GOT_VIDEO_ID = info.video_id;
-                GOT_CURRENT_TIME = info.current_time;
-                GOT_IS_PAUSED = info.is_paused;
-
-                // messageLog(GOT_IS_PAUSED);
-
-                if (!IS_API_READY) {
-                    return;
-                }
-
-                updateVideoPlayer(info);
-            });
-        });
-
-    </script>
+    <script type="text/javascript" src="/sockets/socket-listeners.js"></script>
 
   </body>
 </html>

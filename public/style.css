@@ -1,0 +1,113 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* html {
+    filter: invert(100%) !important;
+} */
+
+.btn {
+    background-color: rgb(52, 52, 52) !important;
+    color: rgb(220, 220, 220) !important;
+    /* font-weight: bold !important; */
+    border-top: 1px solid rgb(10, 10, 10) !important;
+    border-bottom: 1px solid rgb(10, 10, 10) !important;
+}
+
+.btn:hover {
+    opacity: 0.85;
+}
+
+.btn, .btn:focus, .btn:active {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.form-control, .form-control:focus, .form-control:active, #link-display, #link-display:focus, #link-display:active {
+    -webkit-box-shadow: none !important;
+    box-shadow: none !important;
+    border: 0px !important;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgb(138, 138, 138, 0.2); 
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(138, 138, 138, 0.2); 
+}
+
+.form-control::placeholder {
+    color: white;
+    opacity: 0.7;
+}
+
+.form-control, #share-button, #link-display, #checkbox-div {
+    background-color: rgb(40, 40, 40);
+    color: rgb(235, 235, 235);
+}
+
+#checkbox-label:hover, #checkbox:hover {
+    cursor: pointer;
+}
+
+#link-display {
+    color: rgb(245, 245, 245) !important;
+}
+
+#message-input, #help-button {
+    background-color: rgb(35, 35, 35) !important;
+    color: rgb(235, 235, 235) !important;
+}
+
+#share-button {
+    /* border-right: 1px solid rgb(10, 10, 10) !important; */
+}
+
+#share-button, #help-button {
+    border-top: 0px !important;
+}
+
+#message-input {
+    border-top: 1px solid rgb(10, 10, 10) !important;
+}
+
+#share-actual-div {
+    background-color: rgb(40, 40, 40);
+    border: 2px solid rgb(10, 10, 10);
+    color: rgb(235, 235, 235);
+}
+
+#left-side, #right-side {
+    float: left;
+}
+
+#no-videos {
+    background-color: rgb(45, 45, 45);
+    color: rgb(90, 90, 90);
+}
+
+#is-typing-name-label {
+    border-top: 1px solid rgb(10, 10, 10) !important;
+    line-height: 1.5;
+    vertical-align: middle;
+    padding-top: 1px;
+}
+
+.gutter {
+    float: left;
+    background-color: rgb(45, 45, 45);
+    cursor: ew-resize;
+}
+
+.unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
