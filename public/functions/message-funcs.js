@@ -127,7 +127,7 @@ function addMessage(messageInfo) {
 function addUserMessage(message, floatSide, backgroundColor) {
     $('#messages').append(`
         <div class="p-0 m-0 w-100 float-${floatSide}">
-            <label class="text-left d-inline-block bg-${backgroundColor} text-light float-${floatSide} rounded m-1 pl-1 pr-1" style="word-break: break-all;">${message}</label>
+            <label class="text-left d-inline-block bg-${backgroundColor} text-light float-${floatSide} rounded mt-1 ml-1 mr-1 mb-0 pl-1 pr-1" style="word-break: break-all;">${message}</label>
         </div>
     `);
 }

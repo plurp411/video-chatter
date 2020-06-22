@@ -1,5 +1,5 @@
 function resetSenderNameInputColors() {
-    $('#sender-name-input').css('background-color', 'rgb(40, 40, 40)');
+    $('#sender-name-input').css('background-color', 'rgb(50, 50, 50)');
     $('#sender-name-input').css('color', 'rgb(235, 235, 235)');
 }
 

@@ -52,7 +52,7 @@ function handleNextVideo() {
     emitVideoUrlQueue(VIDEO_URL_QUEUE);
 }
 
-function updateVideoQueueDisplay() {
+function updateVideoQueueDisplay(newVideoUrlQueue) {
 
     $('#videos-div').removeClass('d-block');
     $('#videos-div').removeClass('d-none');
@@ -86,13 +86,19 @@ function updateVideoQueue(newVideoUrlQueue) {
         addVideo(position, videoLink, senderId, senderName);
     }
 
-    updateVideoQueueDisplay();
+    updateVideoQueueDisplay(newVideoUrlQueue);
     scrollToBottomVideoUrlQueue();
 }
 
 function addVideo(position, videoLink, senderId, senderName) {
+
+    let backgroundColor = 'rgb(40, 40, 40)';
+    if (position % 2 == 0) {
+        backgroundColor = 'rgb(35, 35, 35)';
+    }
+
     $('#videos').append(`
-        <div class="list-group-item p-0" style="background-color: rgb(35, 35, 35);">
+        <div class="list-group-item p-0 border-0" style="background-color: ${backgroundColor};">
 
             <div class="float-left d-inline-block" style="width: 40px; height: 61px;">
                 <label class="unselectable h-100 w-100 font-weight-bold" style="text-align: center; line-height: 61px; color: rgb(150, 150, 150);">${position}</label>

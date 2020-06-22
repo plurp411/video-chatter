@@ -50,7 +50,9 @@
 
             <!-- video link -->
             <input type="text" id="link-display" class="form-control w-100 font-italic text-truncate pt-1 pb-2 pl-2 pr-2 m-0" value="" readonly>
-            <button class="btn w-100 d-inline-block rounded-0 font-weight-normal" id="copy-link-button">Copy Link</button>
+            <div class="w-100 d-inline-block rounded-0 font-weight-normal p-2">
+                <button class="btn w-100 h-100 rounded" id="copy-link-button">Copy Link</button>
+            </div>
 
             <!-- control checkbox -->
             <div id="checkbox-div" class="checkbox pt-2 pl-2 rounded">
@@ -77,13 +79,17 @@
             </div>
 
             <!-- video link -->
-            <input type="text" class="form-control d-inline-block rounded-0 w-100" id="link-input" placeholder="Video Link" style="background-color: rgb(40, 40, 40); color: rgb(235, 235, 235);"/>
-            <button class="btn w-100 d-inline-block rounded-0 font-weight-normal" id="submit-link-button">Add Video</button>
+            <div class="w-100 d-inline-block rounded-0 font-weight-normal pl-2 pr-2 pt-2">
+                <input type="text" class="form-control d-inline-block rounded text-truncate" id="link-input" placeholder="Video Link" style="background-color: rgb(40, 40, 40); color: rgb(235, 235, 235);"/>
+            </div>
+            <div class="w-100 d-inline-block rounded-0 font-weight-normal p-2">
+                <button class="btn w-100 h-100 rounded" id="submit-link-button">Add Video</button>
+            </div>
 
             <!-- video queue -->
-            <div class="w-100 d-none" id="videos-div" style="flex-grow: 1; overflow-x: hidden; overflow-y: auto;">
+            <div class="d-none ml-2" id="videos-div" style="flex-grow: 1; overflow-x: hidden; overflow-y: auto; width: calc(100% - 16px);">
                 <div style="height: 0px;">
-                    <ul class="list-group list-group-flush" id="videos"></ul>
+                    <ul class="list-group" id="videos"></ul>
                 </div>
             </div>
 
@@ -92,9 +98,10 @@
                 <label id="no-videos" class="unselectable text-center d-inline-block pl-1 pr-1 mt-3 mb-3 small rounded font-weight-bold">No videos in queue</label>
             </div>
 
-            <!-- next video & display name -->
-            <button class="btn w-100 d-inline-block rounded-0 position-relative font-weight-normal invisible" id="next-video-button" style="left: 0px; bottom: 0px;">Play Next</button>
-            <input type="text" class="form-control w-100 d-block rounded-0 position-relative invisible" id="sender-name-input" placeholder="Display Name" style="bottom: 0px;"/>
+            <!-- next video -->
+            <div class="w-100 d-inline-block rounded-0 position-relative font-weight-normal p-2" style="left: 0px; bottom: 0px;">
+                <button class="btn w-100 h-100 rounded invisible" id="next-video-button">Play Next</button>
+            </div>
 
         </div>
     </div>
@@ -102,17 +109,36 @@
     <!-- right side -->
     <div id="right-side" style="height: 100vh; max-width: calc(100% - 204px); min-width: 200px;">
         <div class="w-100 text-center">
-            <div class="w-100" style="height: 100vh; background-color: rgb(25, 25, 25);">
+            <div class="w-100" style="height: 100vh; background-color: rgb(35, 35, 35);">
 
-                <!-- share & help button -->
-                <div>
-                    <button class="btn w-100 d-inline-block rounded-0 font-weight-normal float-left" id="share-button">Share</button>
+                <!-- <div class="w-100 d-inline-block rounded-0 font-weight-normal p-2"> -->
+
+                    <!-- <div class="d-inline-block float-left p-0" style="width: 75%;">
+                        <input type="text" class="w-100 form-control d-block rounded position-relative invisible text-truncate" id="sender-name-input" placeholder="Display Name" style="bottom: 0px;"/>
+                    </div>
+                    <div class="d-inline-block float-right pt-0 pb-0 pr-0 pl-2" style="width: 25%;">
+                        <button class="btn w-100 d-block rounded font-weight-normal" id="share-button">?</button>
+                    </div> -->
+
+                    <div class="d-inline-block float-left p-2 w-100">
+                        <input type="text" class="w-100 form-control d-block rounded position-relative invisible text-truncate" id="sender-name-input" placeholder="Display Name" style="bottom: 0px;"/>
+                    </div>
+
                     <!-- <button class="btn d-inline-block rounded-0 font-weight-normal float-left" id="share-button" style="width: calc(100% - 38px);">Share</button> -->
-                    <!-- <button class="btn d-inline-block rounded-0 font-weight-normal" id="help-button" style="width: 38px;">?</button> -->
-                </div>
+                    
+                <!-- </div> -->
 
-                <!-- all messages -->
-                <div class="w-100 pt-1 pb-1" id="messages-div" style="height: calc(100% - 38px - 38px); overflow-x: hidden; overflow-y: auto;">
+
+
+
+
+                <!-- display name -->
+                <!-- <div class="w-100 d-inline-block rounded-0 font-weight-normal pl-2 pr-2 pb-2">
+                    <input type="text" class="form-control w-100 d-block rounded position-relative invisible" id="sender-name-input" placeholder="Display Name" style="bottom: 0px;"/>
+                </div> -->
+
+                <!-- all messages 56 62 60 -->
+                <div class="ml-2 pt-0 pb-0 rounded" id="messages-div" style="height: calc(100% - 54px - 55px); overflow-x: hidden; overflow-y: auto; background-color: rgb(25, 25, 25); width: calc(100% - 16px);">
                     <div id="messages"></div>
                 </div>
 
@@ -122,15 +148,34 @@
                 </div>
                 
                 <!-- message input -->
-                <div class="position-relative" style="bottom: 0px; height: 38px; width: 100%;">
+                <!-- <div class="position-relative" style="bottom: 0px; height: 38px; width: 100%;">
                     <input type="text" class="form-control d-inline-block float-left rounded-0 w-100 invisible" id="message-input" placeholder="Message" autocomplete="off"/>
+                </div> -->
+
+                <div class="position-relative" style="bottom: 0px; height: 55px; width: 100%;">
+                    <div class="d-inline-block float-left rounded-0 w-100 p-2">
+                        <input type="text" class="form-control d-inline-block rounded text-truncate invisible" id="message-input" placeholder="Message" autocomplete="off"/>
+                    </div>
                 </div>
 
             </div>
         </div>
     </div>
+
+    <script>
+
+        // <!-- share & help -->
+        // <div>
+        //     <div class="w-100 d-inline-block rounded-0 font-weight-normal float-left p-2">
+        //         <button class="btn w-100 h-100 rounded" id="share-button">Share</button>
+        //     </div>
+        //     <!-- <button class="btn d-inline-block rounded-0 font-weight-normal float-left" id="share-button" style="width: calc(100% - 38px);">Share</button> -->
+        //     <!-- <button class="btn d-inline-block rounded-0 font-weight-normal" id="help-button" style="width: 38px;">?</button> -->
+        // </div>
+
+    </script>
     
-    <link href="/main.html" rel="import"/>
+    <!-- <link href="/main.html" rel="import"/> -->
 
     <script async defer type="text/javascript" src="/split/web-font.js"></script>
     <script type="text/javascript" src="/split/split.min.js"></script>
@@ -156,6 +201,19 @@
     <script type="text/javascript" src="/jquery/div-handling.js"></script>
 
     <script type="text/javascript" src="/sockets/socket-listeners.js"></script>
+
+    <script>
+
+        const inputs = document.querySelectorAll('input');
+
+        inputs.forEach(input => {
+            input.setAttribute('autocomplete', 'off')
+            input.setAttribute('autocorrect', 'off')
+            input.setAttribute('autocapitalize', 'off')
+            input.setAttribute('spellcheck', false)
+        })
+
+    </script>
 
   </body>
 </html>

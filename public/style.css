@@ -4,12 +4,17 @@
     filter: invert(100%) !important;
 } */
 
+/* #player {
+    filter: invert(100%) !important;
+} */
+
 .btn {
     background-color: rgb(52, 52, 52) !important;
     color: rgb(220, 220, 220) !important;
     /* font-weight: bold !important; */
-    border-top: 1px solid rgb(10, 10, 10) !important;
-    border-bottom: 1px solid rgb(10, 10, 10) !important;
+    /* border-top: 1px solid rgb(10, 10, 10) !important;
+    border-bottom: 1px solid rgb(10, 10, 10) !important; */
+    border: 2px solid rgb(80, 80, 80) !important;
 }
 
 .btn:hover {
@@ -27,7 +32,7 @@
     border: 0px !important;
 }
 
-::-webkit-scrollbar {
+/* ::-webkit-scrollbar {
     width: 10px;
 }
 
@@ -37,6 +42,20 @@
 
 ::-webkit-scrollbar-thumb {
     background: rgb(138, 138, 138, 0.2); 
+} */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgb(70, 70, 70);
+    border-radius: 0px 4px 4px 0px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgb(100, 100, 100);
+    border-radius: 0px 4px 4px 0px;
 }
 
 .form-control::placeholder {
@@ -44,8 +63,9 @@
     opacity: 0.7;
 }
 
+/* !important */
 .form-control, #share-button, #link-display, #checkbox-div {
-    background-color: rgb(40, 40, 40);
+    background-color: rgb(50, 50, 50);
     color: rgb(235, 235, 235);
 }
 
@@ -57,8 +77,19 @@
     color: rgb(245, 245, 245) !important;
 }
 
-#message-input, #help-button {
+/* #message-input */
+#help-button {
     background-color: rgb(35, 35, 35) !important;
+    color: rgb(235, 235, 235) !important;
+}
+
+/* */
+/* #message-input, #sender-name-input {
+    background-color: rgb(35, 35, 35) !important;
+    color: rgb(235, 235, 235) !important;
+} */
+#message-input {
+    background-color: rgb(50, 50, 50) !important;
     color: rgb(235, 235, 235) !important;
 }
 
@@ -67,11 +98,11 @@
 }
 
 #share-button, #help-button {
-    border-top: 0px !important;
+    /* border-top: 0px !important; */
 }
 
 #message-input {
-    border-top: 1px solid rgb(10, 10, 10) !important;
+    /* border-top: 1px solid rgb(10, 10, 10) !important; */
 }
 
 #share-actual-div {
@@ -98,7 +129,7 @@
 
 .gutter {
     float: left;
-    background-color: rgb(45, 45, 45);
+    background-color: rgb(55, 55, 55);
     cursor: ew-resize;
 }
 
