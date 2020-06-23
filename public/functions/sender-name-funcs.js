@@ -5,6 +5,9 @@ function resetSenderNameInputColors() {
 
 function handleNewSenderName() {
     const currentSenderName = getCurrentSenderName();
+    if (isHTML(currentSenderName)) {
+        return;
+    }
     if (currentSenderName != '' && currentSenderName != CURRENT_NAME) {
         emitSenderNameChangeInfo(currentSenderName);
     }
@@ -33,5 +36,9 @@ function updateSenderName(senderNameChangeInfo) {
             VIDEO_URL_QUEUE[videoLink].sender_name = senderNameChangeName;
         }
     }
+}
+
+function makeSenderNameInputRed() {
+    $('#sender-name-input').css('background-color', '#ff8585');
 }
 

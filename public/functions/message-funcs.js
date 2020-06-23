@@ -26,7 +26,7 @@ function handleMessageKeyup() {
 function handleSendMessage() {
 
     const messageText = $('#message-input').val().trim();
-    if (messageText != '' && CURRENT_NAME != '') {
+    if (messageText != '' && CURRENT_NAME != '' && !isHTML(messageText)) {
 
         const messageInfo = {
             message: messageText,
@@ -49,7 +49,7 @@ function handleSendMessage() {
     }
 
     if (CURRENT_NAME == '') {
-        $('#sender-name-input').css('background-color', '#291a1a');
+        makeSenderNameInputRed();
     }
     
     return false;

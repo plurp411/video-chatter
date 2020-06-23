@@ -2,10 +2,18 @@
 
 /* html {
     filter: invert(100%) !important;
-} */
+}
 
-/* #player {
+#player {
     filter: invert(100%) !important;
+}
+
+::-moz-selection {
+    background: #FC7703 !important;
+}
+
+::selection {
+    background: #FC7703 !important;
 } */
 
 .btn {
@@ -14,7 +22,9 @@
     /* font-weight: bold !important; */
     /* border-top: 1px solid rgb(10, 10, 10) !important;
     border-bottom: 1px solid rgb(10, 10, 10) !important; */
-    border: 2px solid rgb(80, 80, 80) !important;
+
+    /* border: 2px solid rgb(80, 80, 80) !important; */
+    border: 1px solid rgb(140, 140, 140) !important;
 }
 
 .btn:hover {
@@ -64,7 +74,7 @@
 }
 
 /* !important */
-.form-control, #share-button, #link-display, #checkbox-div {
+.form-control, #share-button, #link-display {
     background-color: rgb(50, 50, 50);
     color: rgb(235, 235, 235);
 }
@@ -89,6 +99,7 @@
     color: rgb(235, 235, 235) !important;
 } */
 #message-input {
+    /* background-color: rgb(65, 65, 65) !important; */
     background-color: rgb(50, 50, 50) !important;
     color: rgb(235, 235, 235) !important;
 }
@@ -106,8 +117,8 @@
 }
 
 #share-actual-div {
-    background-color: rgb(40, 40, 40);
-    border: 2px solid rgb(10, 10, 10);
+    background-color: rgb(30, 30, 30);
+    border: 2px solid rgb(150, 150, 150);
     color: rgb(235, 235, 235);
 }
 
@@ -121,15 +132,18 @@
 }
 
 #is-typing-name-label {
-    border-top: 1px solid rgb(10, 10, 10) !important;
     line-height: 1.5;
     vertical-align: middle;
-    padding-top: 1px;
+    padding-top: 2px;
+    border-radius: 0px 0px 4px 4px;
+    word-break: break-all;
+    background-color: rgb(40, 40, 40);
+    color: rgb(190, 190, 190);
 }
 
 .gutter {
     float: left;
-    background-color: rgb(55, 55, 55);
+    background-color: rgb(40, 40, 40);
     cursor: ew-resize;
 }
 

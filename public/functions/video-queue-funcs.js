@@ -1,14 +1,14 @@
 function handleSubmitLink() {
 
     if (CURRENT_NAME == '') {
-        $('#sender-name-input').css('background-color', '#291a1a');
+        makeSenderNameInputRed();
         return;
     }
 
     const videoLink = $("#link-input").val().trim();
     const videoId = getVideoIdFromLink(videoLink);
 
-    if (!videoId || videoId == VIDEO_ID || videoLink in VIDEO_URL_QUEUE) {
+    if (!videoId || videoId == VIDEO_ID || videoLink in VIDEO_URL_QUEUE || isHTML(videoLink)) {
         return;
     }
 
@@ -35,7 +35,7 @@ function handleSubmitLink() {
 function handleNextVideo() {
 
     if (CURRENT_NAME == '') {
-        $('#sender-name-input').css('background-color', '#291a1a');
+        makeSenderNameInputRed();
         return;
     }
 

@@ -27,7 +27,7 @@
   <label class="d-none" id="user-id-label"><%= machine_id %></label>
 
   <!-- main -->
-  <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(30, 30, 30);">
+  <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(25, 25, 25);">
 
     <!-- loading spinner -->
     <div id="loading-div" class="row align-items-center h-100 w-100" style="background-color: rgb(60, 60, 60); z-index: 1;">
@@ -37,7 +37,7 @@
     </div>
 
     <!-- share background -->
-    <div id="share-cancel-div" class="w-100 h-100 position-absolute invisible" style="z-index: 1; opacity: 0.2; background-color: black;"></div>
+    <div id="share-cancel-div" class="w-100 h-100 position-absolute invisible" style="z-index: 1; opacity: 0.3; background-color: black;"></div>
 
     <!-- share pop up -->
     <div id="share-div" class="w-100 position-absolute invisible" style="text-align: center; top: 20%; z-index: 1; pointer-events: none;">
@@ -49,13 +49,14 @@
             </div>
 
             <!-- video link -->
-            <input type="text" id="link-display" class="form-control w-100 font-italic text-truncate pt-1 pb-2 pl-2 pr-2 m-0" value="" readonly>
+            
             <div class="w-100 d-inline-block rounded-0 font-weight-normal p-2">
+                <input type="text" id="link-display" class="form-control w-100 font-italic text-truncate pt-1 pb-2 pl-2 pr-2 mb-2" value="" readonly>
                 <button class="btn w-100 h-100 rounded" id="copy-link-button">Copy Link</button>
             </div>
 
             <!-- control checkbox -->
-            <div id="checkbox-div" class="checkbox pt-2 pl-2 rounded">
+            <div id="checkbox-div" class="checkbox pl-2 rounded">
                 <label id="checkbox-label" class="unselectable" style="color:rgb(200, 200, 200); margin-left: 1px;"><input type="checkbox" id="checkbox" class="position-relative" style="top: 1px;" value="">&ensp;Only I have control</label>
             </div>
 
@@ -67,15 +68,17 @@
         <div class="w-100 h-100 text-center" style="display: flex; flex-direction: column;">
 
             <!-- video player -->
-            <div class="embed-responsive embed-responsive-16by9" style="flex-shrink: 1; background-color: black;">
+            <div class="d-inline-block pt-2 pl-2 pr-2">
+                <div class="embed-responsive embed-responsive-16by9 rounded" style="flex-shrink: 1; background-color: black; border: 2px solid rgb(180, 180, 180);">
 
-                <!-- video buffering -->
-                <div id="is-buffering-name-div" class="p-0 m-0 float-left position-absolute invisible w-100" style="pointer-events: none; top: calc(25% - 5px); z-index: 1;">
-                    <label id="is-buffering-name-label" class="unselectable text-center d-inline-block pl-1 pr-1 small rounded font-weight-bold" style="background-color: rgb(60, 60, 60); color: rgb(150, 150, 150);"></label>
+                    <!-- video buffering -->
+                    <div id="is-buffering-name-div" class="p-0 m-0 float-left position-absolute invisible w-100" style="pointer-events: none; top: calc(25% - 5px); z-index: 1;">
+                        <label id="is-buffering-name-label" class="unselectable text-center d-inline-block pl-1 pr-1 small rounded font-weight-bold" style="background-color: rgb(60, 60, 60); color: rgb(150, 150, 150);"></label>
+                    </div>
+
+                    <!-- actual player -->
+                    <div id="player"></div>
                 </div>
-
-                <!-- actual player -->
-                <div id="player"></div>
             </div>
 
             <!-- video link -->
@@ -109,7 +112,7 @@
     <!-- right side -->
     <div id="right-side" style="height: 100vh; max-width: calc(100% - 204px); min-width: 200px;">
         <div class="w-100 text-center">
-            <div class="w-100" style="height: 100vh; background-color: rgb(35, 35, 35);">
+            <div class="w-100 position-relative" style="height: 100vh; background-color: rgb(25, 25, 25);">
 
                 <!-- <div class="w-100 d-inline-block rounded-0 font-weight-normal p-2"> -->
 
@@ -121,7 +124,8 @@
                     </div> -->
 
                     <div class="d-inline-block float-left p-2 w-100">
-                        <input type="text" class="w-100 form-control d-block rounded position-relative invisible text-truncate" id="sender-name-input" placeholder="Display Name" style="bottom: 0px;"/>
+                        <input type="text" class="form-control d-inline-block rounded invisible text-truncate float-left" id="sender-name-input" placeholder="Display Name" style="bottom: 0px; width: calc(100% - 46px);"/>
+                        <button class="btn d-inline-block rounded font-weight-normal m-0 float-right" id="share-button" style="width: 38px;">?</button>
                     </div>
 
                     <!-- <button class="btn d-inline-block rounded-0 font-weight-normal float-left" id="share-button" style="width: calc(100% - 38px);">Share</button> -->
@@ -138,14 +142,15 @@
                 </div> -->
 
                 <!-- all messages 56 62 60 -->
-                <div class="ml-2 pt-0 pb-0 rounded" id="messages-div" style="height: calc(100% - 54px - 55px); overflow-x: hidden; overflow-y: auto; background-color: rgb(25, 25, 25); width: calc(100% - 16px);">
+                <div class="ml-2 pt-0 pb-0 rounded" id="messages-div" style="height: calc(100% - 54px - 55px); overflow-x: hidden; overflow-y: auto; background-color: rgb(35, 35, 35); width: calc(100% - 16px);">
                     <div id="messages"></div>
                 </div>
 
                 <!-- is typing -->
-                <div id="is-typing-name-div" class="p-0 m-0 w-100 float-left position-absolute invisible" style="bottom: 38px; height: 25px; line-height: 25px;">
-                    <label id="is-typing-name-label" class="text-left d-inline-block float-left pl-2 pr-2 small w-100 h-100 m-0" style="word-break: break-all; background-color: rgb(40, 40, 40); color: rgb(190, 190, 190);"></label>
+                <div id="is-typing-name-div" class="pl-2 pr-2 m-0 float-left position-absolute invisible" style="bottom: 55px; height: 25px; line-height: 25px; width: 100%;">
+                    <label id="is-typing-name-label" class="text-left d-inline-block float-left pl-2 pr-2 small w-100 h-100 m-0"></label>
                 </div>
+
                 
                 <!-- message input -->
                 <!-- <div class="position-relative" style="bottom: 0px; height: 38px; width: 100%;">
