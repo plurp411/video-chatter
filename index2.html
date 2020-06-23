@@ -45,18 +45,17 @@
             
             <!-- link instructions -->
             <div class="w-100 p-0 pt-2 pl-2 m-0 text-center">
-                <label class="unselectable text-center d-inline-block pl-1 pr-1 m-0 small rounded font-weight-bold" style="background-color: rgb(60, 60, 60); color: rgb(150, 150, 150);">Share this link:</label>
+                <label class="unselectable text-center d-inline-block pl-1 pr-1 m-0 small rounded font-weight-bold" style="background-color: rgb(60, 60, 60); color: rgb(150, 150, 150);">Invite others with this link:</label>
             </div>
 
             <!-- video link -->
-            
             <div class="w-100 d-inline-block rounded-0 font-weight-normal p-2">
                 <input type="text" id="link-display" class="form-control w-100 font-italic text-truncate pt-1 pb-2 pl-2 pr-2 mb-2" value="" readonly>
                 <button class="btn w-100 h-100 rounded" id="copy-link-button">Copy Link</button>
             </div>
 
             <!-- control checkbox -->
-            <div id="checkbox-div" class="checkbox pl-2 rounded">
+            <div id="checkbox-div" class="checkbox pl-2 rounded d-none">
                 <label id="checkbox-label" class="unselectable" style="color:rgb(200, 200, 200); margin-left: 1px;"><input type="checkbox" id="checkbox" class="position-relative" style="top: 1px;" value="">&ensp;Only I have control</label>
             </div>
 
@@ -186,6 +185,8 @@
     <script type="text/javascript" src="/split/split.min.js"></script>
 
     <script type="text/javascript" src="/global-vars.js"></script>
+    <script type="text/javascript" src="/setups.js"></script>
+
     <script type="text/javascript" src="/split/setup-split.js"></script>
     <script type="text/javascript" src="/player/setup-player.js"></script>
 

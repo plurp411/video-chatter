@@ -103,7 +103,7 @@ app.get('/', function(req, res, next){
       const ipAddress = await publicIp.v4();
       const encryptedIp = encrypt(ipAddress);
       passedData['machine_id'] = encryptedIp;
-      // passedData['machine_id'] = create_UUID();
+      passedData['machine_id'] = create_UUID();
       res.render(__dirname + '/index2.html', passedData);
     })();
 

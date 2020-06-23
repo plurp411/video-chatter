@@ -20,6 +20,9 @@ function updateIsBuffering(isBufferingInfo) {
 
         $('#is-buffering-name-div').removeClass('invisible');
         $('#is-buffering-name-div').addClass('visible');
+        
+    } else if (IS_BUFFERING) {
+        emitIsBufferingInfo(true);
     }
 }
 

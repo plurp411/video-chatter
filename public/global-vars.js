@@ -1,6 +1,8 @@
 const ROOM_ID = $('#room-id-label').html();
 const CURRENT_USER = $('#user-id-label').html();
 
+const YOUTUBE_API_KEY = "AIzaSyD6RqEN-zgYCiDcRD8L1u0wNI5GnxLWVNo";
+
 let CURRENT_NAME = '';
 let VIDEO_ID = '';
 
@@ -22,5 +24,7 @@ let VIDEO_URL_QUEUE = {};
 
 let socket = io();
 
-$('#link-display').val('https://video-chat-280220.wl.r.appspot.com/?id=' + ROOM_ID);
+let START_BUFFERING_SECONDS = null;
+
+let IS_SUBMIT_LINK_DISABLED = false;
 

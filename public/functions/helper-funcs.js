@@ -125,6 +125,9 @@ let delay = (function() {
 
 function getVideoIdFromLink(videoLink) {
     let videoId = videoLink.split('v=')[1];
+    if (videoId === undefined) {
+        return;
+    }
     let ampersandPosition = videoId.indexOf('&');
     if (ampersandPosition != -1) {
         videoId = videoId.substring(0, ampersandPosition);

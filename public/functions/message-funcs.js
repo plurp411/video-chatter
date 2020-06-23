@@ -66,11 +66,11 @@ function addMessage(messageInfo) {
     if (!messageType.includes('server')) {
 
         let floatSide = 'left';
-        let backgroundColor = 'secondary';
+        let backgroundColor = '#a83432';
 
         if (senderId == CURRENT_USER) {
             floatSide = 'right';
-            backgroundColor = 'primary';
+            backgroundColor = '#3275a8';
         }
 
         addUserMessage(message, floatSide, backgroundColor);
@@ -91,7 +91,7 @@ function addMessage(messageInfo) {
         
         if (messageType == 'server_user_connect') {
 
-            if (VIDEO_ID != '') {
+            if (VIDEO_ID != '' && player !== null && IS_PLAYER_READY) {
                 
                 // player.pauseVideo();
 
@@ -101,9 +101,11 @@ function addMessage(messageInfo) {
                 }
 
                 const currentTime = getVideoTime();
+                if (currentTime >= 0) {
                 // if (CURRENT_STATE != YT.PlayerState.BUFFERING) {
                     emitVideoInfo(CURRENT_USER, VIDEO_ID, currentTime, isPaused);
                 // }
+                }
             }
             
             if (!isEmpty(VIDEO_URL_QUEUE)) {
@@ -127,7 +129,7 @@ function addMessage(messageInfo) {
 function addUserMessage(message, floatSide, backgroundColor) {
     $('#messages').append(`
         <div class="p-0 m-0 w-100 float-${floatSide}">
-            <label class="text-left d-inline-block bg-${backgroundColor} text-light float-${floatSide} rounded mt-1 ml-1 mr-1 mb-0 pl-1 pr-1" style="word-break: break-all;">${message}</label>
+            <label class="text-left d-inline-block text-light float-${floatSide} rounded mt-1 ml-1 mr-1 mb-0 pl-1 pr-1" style="word-break: break-all; background-color: ${backgroundColor}">${message}</label>
         </div>
     `);
 }
