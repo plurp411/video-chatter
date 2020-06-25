@@ -19,16 +19,19 @@
 .btn {
     background-color: rgb(52, 52, 52) !important;
     color: rgb(220, 220, 220) !important;
-    /* font-weight: bold !important; */
+    font-weight: bold !important;
     /* border-top: 1px solid rgb(10, 10, 10) !important;
     border-bottom: 1px solid rgb(10, 10, 10) !important; */
 
     /* border: 2px solid rgb(80, 80, 80) !important; */
-    border: 1px solid rgb(140, 140, 140) !important;
+    border: 0px solid rgb(140, 140, 140) !important;
+    /* transition: 0.2s all ease !important; */
 }
 
 .btn:hover {
-    opacity: 0.85;
+    /* opacity: 0.85; */
+    /* filter: brightness(85%); */
+    filter: brightness(90%);
 }
 
 .btn, .btn:focus, .btn:active {
@@ -83,8 +86,13 @@
     cursor: pointer;
 }
 
-#link-display {
-    color: rgb(245, 245, 245) !important;
+#is-admin-checkbox {
+    filter: brightness(70%) grayscale(100%);
+}
+
+#link-display, #welcome-email-input {
+    background-color: rgb(40, 40, 40) !important;
+    color: rgb(215, 215, 215) !important;
 }
 
 /* #message-input */
@@ -94,14 +102,17 @@
 }
 
 /* */
-/* #message-input, #sender-name-input {
-    background-color: rgb(35, 35, 35) !important;
-    color: rgb(235, 235, 235) !important;
-} */
 #message-input {
-    /* background-color: rgb(65, 65, 65) !important; */
+    background-color: rgb(40, 40, 40) !important;
+    color: rgb(235, 235, 235) !important;
+}
+/* #message-input, #welcome-email-input {
     background-color: rgb(50, 50, 50) !important;
     color: rgb(235, 235, 235) !important;
+} */
+#sender-name-input {
+    background-color: rgb(40, 40, 40);
+    color: rgb(235, 235, 235);
 }
 
 #share-button {
@@ -116,9 +127,14 @@
     /* border-top: 1px solid rgb(10, 10, 10) !important; */
 }
 
-#share-actual-div {
-    background-color: rgb(30, 30, 30);
-    border: 2px solid rgb(150, 150, 150);
+#messages-div {
+    /* background-color: rgb(30, 30, 30); */
+    background-color: rgb(50, 50, 50);
+}
+
+#share-actual-div, #welcome-actual-div {
+    background-color: rgb(20, 20, 20);
+    border: 4px solid rgb(150, 150, 150);
     color: rgb(235, 235, 235);
 }
 

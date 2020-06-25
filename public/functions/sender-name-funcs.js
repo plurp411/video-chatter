@@ -1,5 +1,7 @@
 function resetSenderNameInputColors() {
-    $('#sender-name-input').css('background-color', 'rgb(50, 50, 50)');
+    // $('#sender-name-input').css('background-color', 'rgb(50, 50, 50)');
+    // $('#sender-name-input').css('color', 'rgb(235, 235, 235)');
+    $('#sender-name-input').css('background-color', 'rgb(40, 40, 40)');
     $('#sender-name-input').css('color', 'rgb(235, 235, 235)');
 }
 
@@ -12,7 +14,10 @@ function handleNewSenderName() {
         emitSenderNameChangeInfo(currentSenderName);
     }
     CURRENT_NAME = currentSenderName;
-    $('#sender-name-input').val(getCurrentSenderName());
+    if (canUseStorage()) {
+        localStorage.setItem("display_name", currentSenderName);
+    }
+    $('#sender-name-input').val(currentSenderName);
 }
 
 function handleSenderNameInput() {
@@ -40,5 +45,11 @@ function updateSenderName(senderNameChangeInfo) {
 
 function makeSenderNameInputRed() {
     $('#sender-name-input').css('background-color', '#ff8585');
+}
+
+function getSetDisplayName() {
+    const displayName = localStorage.getItem("display_name");
+    $('#sender-name-input').val(displayName);
+    handleNewSenderName();
 }
 

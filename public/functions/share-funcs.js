@@ -19,3 +19,19 @@ function handleCopyLink() {
     document.execCommand("copy");
 }
 
+function handleHostOwn() {
+    window.location.href = 'https://video-chat-280220.wl.r.appspot.com/';
+}
+
+function setupSharePopup() {
+
+    if (CURRENT_USER == ROOM_ID) {
+
+        $('#is-admin-checkbox-div').removeClass('d-none');
+        $('#host-own-div').removeClass('d-inline-block');
+
+        $('#is-admin-checkbox-div').addClass('d-block');
+        $('#host-own-div').addClass('d-none');
+    }
+}
+

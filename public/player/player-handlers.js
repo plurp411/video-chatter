@@ -1,10 +1,6 @@
 function onYouTubeIframeAPIReady() {
 
-    $("#loading-div").remove();
-
-    $("#next-video-button").removeClass('invisible');
-    $("#sender-name-input").removeClass('invisible');
-    $("#message-input").removeClass('invisible');
+    showMainView();
 
     IS_API_READY = true;
     

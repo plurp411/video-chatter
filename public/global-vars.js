@@ -30,3 +30,5 @@ let IS_SUBMIT_LINK_DISABLED = false;
 
 let IS_ADMIN = false;
 
+let IS_FIRST_TIME = true;
+

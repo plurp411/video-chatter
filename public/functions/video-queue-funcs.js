@@ -136,3 +136,7 @@ function addVideo(position, senderId, senderName, title) {
     `);
 }
 
+function setupSetLinkDisplayInput() {
+    $('#link-display').val('https://video-chat-280220.wl.r.appspot.com/?id=' + ROOM_ID);
+}
+

@@ -27,36 +27,72 @@
   <label class="d-none" id="user-id-label"><%= machine_id %></label>
 
   <!-- main -->
-  <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(25, 25, 25);">
+  <body class="w-100 h-100 overflow-hidden" style="background-color: rgb(20, 20, 20);">
 
     <!-- loading spinner -->
-    <div id="loading-div" class="row align-items-center h-100 w-100" style="background-color: rgb(60, 60, 60); z-index: 1;">
+    <div id="loading-div" class="row align-items-center h-100 w-100" style="background-color: rgb(20, 20, 20); z-index: 1;">
         <div class="col-12 text-center">
             <div class="spinner-border text-light"></div>
         </div>
     </div>
 
+    <!-- welcome background -->
+    <div id="welcome-cancel-div" class="w-100 h-100 position-absolute invisible" style="z-index: 1; opacity: 0.4; background-color: black;"></div>
+
+    <!-- welcome pop up -->
+    <div id="welcome-div" class="w-100 position-absolute invisible" style="text-align: center; top: 20%; z-index: 1; pointer-events: none;">
+        <div id="welcome-actual-div" class="d-inline-block p-0 text-left rounded" style="width: 350px; pointer-events: auto;">
+
+            <!-- welcome title -->
+            <label class="w-100 p-2 d-inline-block m-0" style="color:rgb(180, 180, 180);">Welcome to <b>YouTube Watch Party</b> !</label>
+
+            <!-- welcome email and okay -->
+            <div class="w-100 d-inline-block rounded-0 font-weight-normal pb-2 pl-2 pr-2">
+                <input type="text" id="welcome-email-input" class="form-control w-100 text-truncate pt-1 pb-2 pl-2 pr-2 mb-2" placeholder="Email (optional)">
+                <button class="btn w-100 rounded" id="welcome-okay-button">Let's Party!</button>
+            </div>
+
+        </div>
+    </div>
+
     <!-- share background -->
-    <div id="share-cancel-div" class="w-100 h-100 position-absolute invisible" style="z-index: 1; opacity: 0.3; background-color: black;"></div>
+    <div id="share-cancel-div" class="w-100 h-100 position-absolute invisible" style="z-index: 1; opacity: 0.4; background-color: black;"></div>
 
     <!-- share pop up -->
     <div id="share-div" class="w-100 position-absolute invisible" style="text-align: center; top: 20%; z-index: 1; pointer-events: none;">
         <div id="share-actual-div" class="d-inline-block p-0 text-left rounded" style="width: 350px; pointer-events: auto;">
             
             <!-- link instructions -->
-            <div class="w-100 p-0 pt-2 pl-2 m-0 text-center">
+            <!-- <div class="w-100 p-0 pt-2 m-0 text-center">
                 <label class="unselectable text-center d-inline-block pl-1 pr-1 m-0 small rounded font-weight-bold" style="background-color: rgb(60, 60, 60); color: rgb(150, 150, 150);">Invite others with this link:</label>
-            </div>
+            </div> -->
+            <label class="w-100 p-2 d-inline-block mt-2 mb-0 mr-0 ml-0" style="color:rgb(180, 180, 180);"><b>Invite others</b> with this link:</label>
 
             <!-- video link -->
             <div class="w-100 d-inline-block rounded-0 font-weight-normal p-2">
                 <input type="text" id="link-display" class="form-control w-100 font-italic text-truncate pt-1 pb-2 pl-2 pr-2 mb-2" value="" readonly>
-                <button class="btn w-100 h-100 rounded" id="copy-link-button">Copy Link</button>
+                <button class="btn w-100 rounded" id="copy-link-button">Copy Link</button>
+            </div>
+
+            <!-- host own -->
+            <div class="d-inline-block w-100" id="host-own-div">
+                
+                <!-- host own label -->
+                <!-- <div class="w-100 p-0 m-0 text-center">
+                    <label class="unselectable text-center d-inline-block pl-1 pr-1 m-0 small rounded font-weight-bold" style="background-color: rgb(60, 60, 60); color: rgb(150, 150, 150);">Host your own watch party:</label>
+                </div> -->
+                <label class="w-100 p-2 d-inline-block m-0" style="color:rgb(180, 180, 180);">Host your own <b>YouTube Watch Party</b>:</label>
+
+                <!-- host own button -->
+                <div class="w-100 d-inline-block rounded-0 font-weight-normal p-2">
+                    <button class="btn w-100 rounded" id="host-own-button">Host</button>
+                </div>
+
             </div>
 
             <!-- control checkbox -->
-            <div id="is-admin-checkbox-div" class="checkbox pl-2 rounded d-none">
-                <label id="is-admin-checkbox-label" class="unselectable" style="color:rgb(200, 200, 200); margin-left: 1px;"><input type="checkbox" id="is-admin-checkbox" class="position-relative" style="top: 1px;" value="">&ensp;Only I have control</label>
+            <div id="is-admin-checkbox-div" class="checkbox p-2 rounded d-none text-center">
+                <label id="is-admin-checkbox-label" class="unselectable" style="color:rgb(180, 180, 180); margin-left: 1px;"><input type="checkbox" id="is-admin-checkbox" class="position-relative" style="top: 1px;" value="">&ensp;<b>Only I have control</b></label>
             </div>
 
         </div>
@@ -68,7 +104,7 @@
 
             <!-- video player -->
             <div class="d-inline-block pt-2 pl-2 pr-2">
-                <div class="embed-responsive embed-responsive-16by9 rounded" style="flex-shrink: 1; background-color: black; border: 2px solid rgb(180, 180, 180);">
+                <div class="embed-responsive embed-responsive-16by9 rounded" style="flex-shrink: 1; background-color: rgb(65, 65, 65); border: 0px solid rgb(180, 180, 180);">
 
                     <!-- video buffering -->
                     <div id="is-buffering-name-div" class="p-0 m-0 float-left position-absolute invisible w-100" style="pointer-events: none; top: calc(25% - 5px); z-index: 1;">
@@ -111,7 +147,7 @@
     <!-- right side -->
     <div id="right-side" style="height: 100vh; max-width: calc(100% - 204px); min-width: 200px;">
         <div class="w-100 text-center">
-            <div class="w-100 position-relative" style="height: 100vh; background-color: rgb(25, 25, 25);">
+            <div class="w-100 position-relative" style="height: 100vh; background-color: rgb(20, 20, 20);">
 
                 <!-- <div class="w-100 d-inline-block rounded-0 font-weight-normal p-2"> -->
 
@@ -141,7 +177,7 @@
                 </div> -->
 
                 <!-- all messages 56 62 60 -->
-                <div class="ml-2 pt-0 pb-0 rounded" id="messages-div" style="height: calc(100% - 54px - 55px); overflow-x: hidden; overflow-y: auto; background-color: rgb(35, 35, 35); width: calc(100% - 16px);">
+                <div class="ml-2 pt-0 pb-0 rounded" id="messages-div" style="height: calc(100% - 54px - 55px); overflow-x: hidden; overflow-y: auto; width: calc(100% - 16px);">
                     <div id="messages"></div>
                 </div>
 
@@ -185,11 +221,11 @@
     <script type="text/javascript" src="/split/split.min.js"></script>
 
     <script type="text/javascript" src="/global-vars.js"></script>
-    <script type="text/javascript" src="/setups.js"></script>
 
     <script type="text/javascript" src="/split/setup-split.js"></script>
     <script type="text/javascript" src="/player/setup-player.js"></script>
 
+    <script type="text/javascript" src="/functions/other-funcs.js"></script>
     <script type="text/javascript" src="/functions/helper-funcs.js"></script>
     <script type="text/javascript" src="/functions/message-funcs.js"></script>
     <script type="text/javascript" src="/functions/sender-name-funcs.js"></script>
@@ -199,9 +235,13 @@
     <script type="text/javascript" src="/functions/buffering-funcs.js"></script>
     <script type="text/javascript" src="/functions/typing-funcs.js"></script>
     <script type="text/javascript" src="/functions/admin-funcs.js"></script>
+    <script type="text/javascript" src="/functions/welcome-funcs.js"></script>
 
     <script type="text/javascript" src="/player/player-handlers.js"></script>
     <script type="text/javascript" src="/sockets/socket-emits.js"></script>
+
+    <script type="text/javascript" src="/setup-funcs.js"></script>
+    <script type="text/javascript" src="/setup.js"></script>
 
     <script type="text/javascript" src="/jquery/button-handling.js"></script>
     <script type="text/javascript" src="/jquery/input-handling.js"></script>

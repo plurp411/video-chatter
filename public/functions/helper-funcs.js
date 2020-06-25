@@ -165,3 +165,9 @@ function isUserAdmin() {
     return false;
 }
 
+function canUseStorage() {
+    if (typeof(Storage) !== "undefined") {
+        return true;
+    }
+    return false;
+}

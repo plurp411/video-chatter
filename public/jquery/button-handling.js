@@ -28,3 +28,15 @@ $("#next-video-button").click(function() {
     handleNextVideo();
 })
 
+// HOST OWN
+
+$("#host-own-button").click(function() {
+    handleHostOwn();
+})
+
+// WELCOME OKAY
+
+$("#welcome-okay-button").click(function() {
+    updateWelcomeVisibility(false);
+})
+
