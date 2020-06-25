@@ -1,4 +1,5 @@
 function emitVideoInfo(fromUser, videoId, currentTime, isPaused) {
+    if (!isUserAdmin()) { return; }
     const videoInfo = {
         from_user: fromUser,
         video_id: videoId,
@@ -17,6 +18,7 @@ function emitIsTypingInfo(isTyping) {
 }
 
 function emitIsBufferingInfo(isBuffering) {
+    if (!isUserAdmin()) { return; }
     const isBufferingInfo = {
         is_buffering_name: CURRENT_NAME,
         is_buffering: isBuffering
@@ -40,5 +42,9 @@ function emitVideoUrlQueue(videoUrlQueue) {
 
 function emitMessageInfo(messageInfo) {
     socket.emit('message_info', messageInfo);
+}
+
+function emitIsAdmin(isAdmin) {
+    socket.emit('is_admin', isAdmin);
 }
 

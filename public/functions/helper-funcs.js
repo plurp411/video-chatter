@@ -86,6 +86,8 @@ function emojiParse(text) {
     text = text.replace(/\:\$/g, "🤐");
     // hush
     text = text.replace(/\:\%/g, "🤫");
+    // eye roll
+    text = text.replace(/e\_e/g, "🙄");
 
     // other
     // dot heart
@@ -151,6 +153,15 @@ function isHTML(str) {
         if (c[i].nodeType == 1) return true; 
     }
 
+    return false;
+}
+
+function isUserAdmin() {
+    if (IS_ADMIN && CURRENT_USER == ROOM_ID) {
+        return true;
+    } else if (!IS_ADMIN) {
+        return true;
+    }
     return false;
 }
 

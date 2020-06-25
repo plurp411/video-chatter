@@ -28,3 +28,5 @@ let START_BUFFERING_SECONDS = null;
 
 let IS_SUBMIT_LINK_DISABLED = false;
 
+let IS_ADMIN = false;
+

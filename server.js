@@ -103,7 +103,11 @@ app.get('/', function(req, res, next){
       const ipAddress = await publicIp.v4();
       const encryptedIp = encrypt(ipAddress);
       passedData['machine_id'] = encryptedIp;
-      passedData['machine_id'] = create_UUID();
+
+      // if (Math.random() < 0.5) {
+      //   passedData['machine_id'] = create_UUID();
+      // }
+
       res.render(__dirname + '/index2.html', passedData);
     })();
 
@@ -196,6 +200,13 @@ io.on('connection', function(socket){
   socket.join(ROOM_ID);
   socket.on('sender_name_change_info', function(senderNameChangeInfo){
     socket.broadcast.to(ROOM_ID).emit('sender_name_change_info', senderNameChangeInfo);
+  });
+});
+
+io.on('connection', function(socket){
+  socket.join(ROOM_ID);
+  socket.on('is_admin', function(isAdmin){
+    socket.broadcast.to(ROOM_ID).emit('is_admin', isAdmin);
   });
 });
 

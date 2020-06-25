@@ -111,6 +111,10 @@ function addMessage(messageInfo) {
             if (!isEmpty(VIDEO_URL_QUEUE)) {
                 emitVideoUrlQueue(VIDEO_URL_QUEUE);
             }
+
+            if (IS_ADMIN) {
+                emitIsAdmin(IS_ADMIN);
+            }
         }
     }
 

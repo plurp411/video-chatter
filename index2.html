@@ -55,8 +55,8 @@
             </div>
 
             <!-- control checkbox -->
-            <div id="checkbox-div" class="checkbox pl-2 rounded d-none">
-                <label id="checkbox-label" class="unselectable" style="color:rgb(200, 200, 200); margin-left: 1px;"><input type="checkbox" id="checkbox" class="position-relative" style="top: 1px;" value="">&ensp;Only I have control</label>
+            <div id="is-admin-checkbox-div" class="checkbox pl-2 rounded d-none">
+                <label id="is-admin-checkbox-label" class="unselectable" style="color:rgb(200, 200, 200); margin-left: 1px;"><input type="checkbox" id="is-admin-checkbox" class="position-relative" style="top: 1px;" value="">&ensp;Only I have control</label>
             </div>
 
         </div>
@@ -85,7 +85,7 @@
                 <input type="text" class="form-control d-inline-block rounded text-truncate" id="link-input" placeholder="Video Link" style="background-color: rgb(40, 40, 40); color: rgb(235, 235, 235);"/>
             </div>
             <div class="w-100 d-inline-block rounded-0 font-weight-normal p-2">
-                <button class="btn w-100 h-100 rounded" id="submit-link-button">Add Video</button>
+                <button class="btn w-100 h-100 rounded d-block" id="submit-link-button">Add Video</button>
             </div>
 
             <!-- video queue -->
@@ -102,7 +102,7 @@
 
             <!-- next video -->
             <div class="w-100 d-inline-block rounded-0 position-relative font-weight-normal p-2" style="left: 0px; bottom: 0px;">
-                <button class="btn w-100 h-100 rounded invisible" id="next-video-button">Play Next</button>
+                <button class="btn w-100 h-100 rounded invisible d-block" id="next-video-button">Play Next</button>
             </div>
 
         </div>
@@ -198,6 +198,7 @@
     <script type="text/javascript" src="/functions/share-funcs.js"></script>
     <script type="text/javascript" src="/functions/buffering-funcs.js"></script>
     <script type="text/javascript" src="/functions/typing-funcs.js"></script>
+    <script type="text/javascript" src="/functions/admin-funcs.js"></script>
 
     <script type="text/javascript" src="/player/player-handlers.js"></script>
     <script type="text/javascript" src="/sockets/socket-emits.js"></script>
@@ -205,6 +206,7 @@
     <script type="text/javascript" src="/jquery/button-handling.js"></script>
     <script type="text/javascript" src="/jquery/input-handling.js"></script>
     <script type="text/javascript" src="/jquery/div-handling.js"></script>
+    <script type="text/javascript" src="/jquery/checkbox-handling.js"></script>
 
     <script type="text/javascript" src="/sockets/socket-listeners.js"></script>
 

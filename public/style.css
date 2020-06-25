@@ -79,7 +79,7 @@
     color: rgb(235, 235, 235);
 }
 
-#checkbox-label:hover, #checkbox:hover {
+#is-admin-checkbox-label:hover, #is-admin-checkbox:hover {
     cursor: pointer;
 }
 
@@ -142,8 +142,10 @@
 }
 
 .gutter {
+    border-radius: 2px;
+    margin-top: 8px;
     float: left;
-    background-color: rgb(40, 40, 40);
+    background-color: rgb(150, 150, 150);
     cursor: ew-resize;
 }
 

@@ -34,3 +34,10 @@ socket.on('video_info', function(info) {
     handleNewVideoInfo(info);
 });
 
+// IS ADMIN
+
+socket.on('is_admin', function(isAdmin) {
+    updateIsAdmin(isAdmin);
+    $('#is-admin-checkbox').prop("checked", IS_ADMIN);
+});
+
